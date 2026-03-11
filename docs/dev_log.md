@@ -4,6 +4,42 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-11 — Phase 1 Complete: Data Preprocessing Pipeline
+
+**What was done:**
+- Implemented `src/preprocessing.py` — audio loading, resampling to 16 kHz, peak normalization, center-crop/pad to 1.5s (24,000 samples)
+- Implemented `src/features.py` — log-mel spectrogram (40x92), MFCC (92x13), 441-dim classical ML feature extraction, per-channel normalization stats
+- Implemented `src/augmentation.py` — 5 waveform augmentations (time shift, noise injection, pitch shift, speed perturbation, random gain) + SpecAugment (frequency/time masking), designed for on-the-fly use during training
+- Implemented `src/run_preprocessing.py` — orchestrates the full pipeline, generates all feature files and config
+- Created `notebooks/01_preprocessing.ipynb` — verification notebook with shape checks, visualizations, leakage checks
+
+**Implementation detail — `center=False`:**
+- All librosa STFT/mel/MFCC calls use `center=False` to produce the spec's expected 92 frames (not 94 from default `center=True`). This also matches on-device behavior where there is no padding.
+
+**Output artifacts generated:**
+- `data/features/mel_spectrograms/{train,val,test}.npz` — un-normalized log-mel spectrograms
+- `data/features/mfcc/{train,val,test}.npz` — un-normalized MFCCs
+- `data/classical_ml_features/{train,val,test}.npz` — 441-dim feature vectors
+- `data/normalization_stats.npz` — per-mel-band and per-MFCC-coefficient mean/std from training set
+- `data/preprocessing_config.json` — all parameters for reproducibility
+
+**Feature shapes verified:**
+| Feature | Train | Val | Test |
+|---------|-------|-----|------|
+| Mel-spectrogram | (970, 40, 92) | (208, 40, 92) | (208, 40, 92) |
+| MFCC | (970, 92, 13) | (208, 92, 13) | (208, 92, 13) |
+| Classical ML | (970, 441) | (208, 441) | (208, 441) |
+
+**Design decisions:**
+- Features stored un-normalized; normalization applied at training time after augmentation
+- Tier 3 excluded samples (combined faults, label=-1) kept in arrays; filtered at training time
+- Augmentation functions accept `np.random.Generator` for reproducibility
+- Classical features: NaN from degenerate distributions replaced with 0.0
+
+**Status:** Phase 1 complete. All preprocessing artifacts generated and verified. Ready for Phase 2 (classical ML baselines).
+
+---
+
 ## 2026-03-11 — Phase 0 Complete: Project Setup
 
 **What was done:**
