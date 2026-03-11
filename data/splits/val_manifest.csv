@@ -1,0 +1,209 @@
+file_path,filename,state,condition,sample_rate,duration_s,channels,tier1_label,tier1_name,tier2_label,tier2_name,tier3_label,tier3_name
+car_diagnostics_dataset/idle state/low_oil/low_oil_34.wav,low_oil_34.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_51.wav,worn_out_brakes_51.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_24.wav,mix_24.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_53.wav,dead_battery_53.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_41.wav,normal_engine_startup_41.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_27.wav,worn_out_brakes_27.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_42.wav,serpentine_belt_42.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_4.wav,serpentine_belt_4.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_173.wav,normal_engine_idle_173.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/power_steering/power_steering_120.wav,power_steering_120.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/low_oil/low_oil_35.wav,low_oil_35.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_38.wav,mix_38.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_74.wav,mix_74.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_73.wav,worn_out_brakes_73.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_76.wav,mix_76.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_3.wav,worn_out_brakes_3.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_19.wav,worn_out_brakes_19.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/power_steering/power_steering_16.wav,power_steering_16.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/power_steering/power_steering_2.wav,power_steering_2.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_50.wav,mix_50.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/power_steering/power_steering_104.wav,power_steering_104.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/power_steering/power_steering_88.wav,power_steering_88.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_15.wav,normal_engine_idle_15.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_57.wav,dead_battery_57.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_67.wav,mix_67.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_8.wav,worn_out_brakes_8.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_6.wav,dead_battery_6.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_9.wav,mix_9.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_70.wav,normal_engine_idle_70.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_129.wav,normal_engine_idle_129.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/power_steering/power_steering_111.wav,power_steering_111.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_11.wav,bad_ignition_11.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_47.wav,serpentine_belt_47.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_76.wav,serpentine_belt_76.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_73.wav,mix_73.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_85.wav,mix_85.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_23.wav,mix_23.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_78.wav,mix_78.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/power_steering/power_steering_76.wav,power_steering_76.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_26.wav,bad_ignition_26.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_193.wav,normal_engine_idle_193.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/low_oil/low_oil_58.wav,low_oil_58.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_104.wav,serpentine_belt_104.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/low_oil/low_oil_92.wav,low_oil_92.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_27.wav,dead_battery_27.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/idle state/power_steering/power_steering_113.wav,power_steering_113.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_42.wav,mix_42.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_262.wav,normal_engine_idle_262.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_14.wav,mix_14.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_10.wav,normal_engine_startup_10.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_10.wav,mix_10.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_19.wav,normal_brakes_19.wav,braking state,normal_brakes,44100,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_103.wav,mix_103.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_1.wav,mix_1.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_98.wav,mix_98.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_102.wav,normal_engine_idle_102.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_5.wav,mix_5.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_48.wav,mix_48.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/power_steering/power_steering_127.wav,power_steering_127.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_45.wav,serpentine_belt_45.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_100.wav,normal_engine_idle_100.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_42.wav,normal_engine_startup_42.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_100.wav,mix_100.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_64.wav,normal_brakes_64.wav,braking state,normal_brakes,24000,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/power_steering/power_steering_39.wav,power_steering_39.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_204.wav,normal_engine_idle_204.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_76.wav,mix_76.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_82.wav,mix_82.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_68.wav,worn_out_brakes_68.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_105.wav,mix_105.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_24.wav,serpentine_belt_24.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_55.wav,normal_engine_startup_55.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_10.wav,dead_battery_10.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_59.wav,mix_59.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_93.wav,mix_93.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_6.wav,normal_brakes_6.wav,braking state,normal_brakes,44100,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_9.wav,mix_9.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_103.wav,normal_engine_idle_103.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_104.wav,mix_104.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_3.wav,bad_ignition_3.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_163.wav,normal_engine_idle_163.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_90.wav,normal_engine_idle_90.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_15.wav,mix_15.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_9.wav,serpentine_belt_9.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_33.wav,dead_battery_33.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_58.wav,normal_brakes_58.wav,braking state,normal_brakes,24000,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_121.wav,normal_engine_idle_121.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_89.wav,mix_89.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_58.wav,serpentine_belt_58.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/power_steering/power_steering_47.wav,power_steering_47.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_146.wav,normal_engine_idle_146.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_67.wav,mix_67.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_133.wav,normal_engine_idle_133.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_111.wav,mix_111.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_35.wav,mix_35.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_111.wav,serpentine_belt_111.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_46.wav,mix_46.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_22.wav,mix_22.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_49.wav,normal_brakes_49.wav,braking state,normal_brakes,44100,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_97.wav,mix_97.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_74.wav,mix_74.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_40.wav,mix_40.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_14.wav,normal_brakes_14.wav,braking state,normal_brakes,44100,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_42.wav,normal_engine_idle_42.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_96.wav,mix_96.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_104.wav,mix_104.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_18.wav,mix_18.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_69.wav,normal_engine_idle_69.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_30.wav,dead_battery_30.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/idle state/low_oil/low_oil_13.wav,low_oil_13.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_41.wav,mix_41.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/power_steering/power_steering_41.wav,power_steering_41.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_29.wav,bad_ignition_29.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/startup state/dead_battery/dead_battery_40.wav,dead_battery_40.wav,startup state,dead_battery,44100,1.7,1,1,Anomaly,5,Start-Up Fault,8,Dead Battery
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_45.wav,mix_45.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_51.wav,normal_engine_idle_51.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_19.wav,bad_ignition_19.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_10.wav,worn_out_brakes_10.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_181.wav,normal_engine_idle_181.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/power_steering/power_steering_17.wav,power_steering_17.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_49.wav,normal_engine_startup_49.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_54.wav,normal_engine_startup_54.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_11.wav,normal_engine_startup_11.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_35.wav,worn_out_brakes_35.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/power_steering/power_steering_80.wav,power_steering_80.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_61.wav,normal_engine_idle_61.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/low_oil/low_oil_96.wav,low_oil_96.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_12.wav,serpentine_belt_12.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_39.wav,normal_engine_startup_39.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_143.wav,normal_engine_idle_143.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_234.wav,normal_engine_idle_234.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_16.wav,bad_ignition_16.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/idle state/power_steering/power_steering_75.wav,power_steering_75.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_10.wav,serpentine_belt_10.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_49.wav,mix_49.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/low_oil/low_oil_106.wav,low_oil_106.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_103.wav,mix_103.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/low_oil/low_oil_19.wav,low_oil_19.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_16.wav,serpentine_belt_16.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_106.wav,serpentine_belt_106.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/power_steering/power_steering_57.wav,power_steering_57.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_54.wav,mix_54.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_13.wav,worn_out_brakes_13.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_116.wav,mix_116.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/low_oil/low_oil_23.wav,low_oil_23.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_69.wav,mix_69.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_13.wav,mix_13.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_97.wav,mix_97.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/power_steering/power_steering_101.wav,power_steering_101.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/power_steering/power_steering_62.wav,power_steering_62.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/low_oil/low_oil_51.wav,low_oil_51.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_63.wav,mix_63.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_247.wav,normal_engine_idle_247.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_158.wav,normal_engine_idle_158.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/low_oil/low_oil_12.wav,low_oil_12.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil/mix_71.wav,mix_71.wav,idle state,combined/power steering combined_no oil,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_44.wav,bad_ignition_44.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_258.wav,normal_engine_idle_258.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_17.wav,serpentine_belt_17.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_62.wav,normal_engine_idle_62.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_59.wav,normal_engine_idle_59.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_155.wav,normal_engine_idle_155.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_23.wav,normal_engine_idle_23.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_93.wav,mix_93.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_34.wav,mix_34.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_190.wav,normal_engine_idle_190.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/low_oil/low_oil_90.wav,low_oil_90.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_15.wav,worn_out_brakes_15.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/low_oil/low_oil_55.wav,low_oil_55.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_86.wav,mix_86.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_71.wav,mix_71.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_20.wav,normal_engine_idle_20.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_176.wav,normal_engine_idle_176.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_261.wav,normal_engine_idle_261.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/startup state/normal_engine_startup/normal_engine_startup_43.wav,normal_engine_startup_43.wav,startup state,normal_engine_startup,44100,1.7,1,0,Normal,4,Normal Start-Up,6,Normal Start-Up
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_39.wav,normal_brakes_39.wav,braking state,normal_brakes,44100,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_71.wav,normal_engine_idle_71.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_41.wav,normal_engine_idle_41.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_32.wav,mix_32.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_122.wav,normal_engine_idle_122.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_20.wav,mix_20.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/power_steering/power_steering_3.wav,power_steering_3.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_50.wav,mix_50.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/low_oil/low_oil_78.wav,low_oil_78.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_18.wav,mix_18.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/low_oil/low_oil_22.wav,low_oil_22.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_83.wav,normal_engine_idle_83.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_42.wav,normal_brakes_42.wav,braking state,normal_brakes,44100,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_49.wav,bad_ignition_49.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_61.wav,normal_brakes_61.wav,braking state,normal_brakes,24000,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_30.wav,bad_ignition_30.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_31.wav,normal_brakes_31.wav,braking state,normal_brakes,44100,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_83.wav,mix_83.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_2.wav,mix_2.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/startup state/bad_ignition/bad_ignition_41.wav,bad_ignition_41.wav,startup state,bad_ignition,44100,1.7,1,1,Anomaly,5,Start-Up Fault,7,Bad Ignition
+car_diagnostics_dataset/braking state/normal_brakes/normal_brakes_65.wav,normal_brakes_65.wav,braking state,normal_brakes,24000,1.5,1,0,Normal,0,Normal Braking,0,Normal Braking
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_28.wav,serpentine_belt_28.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_7.wav,mix_7.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/no oil_serpentine belt/mix_25.wav,mix_25.wav,idle state,combined/no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/combined/power steering combined_serpentine belt/mix_77.wav,mix_77.wav,idle state,combined/power steering combined_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/power_steering/power_steering_83.wav,power_steering_83.wav,idle state,power_steering,44100,1.5,1,1,Anomaly,3,Idle Fault,4,Power Steering Fault
+car_diagnostics_dataset/idle state/serpentine_belt/serpentine_belt_43.wav,serpentine_belt_43.wav,idle state,serpentine_belt,44100,1.5,1,1,Anomaly,3,Idle Fault,5,Serpentine Belt Fault
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_86.wav,mix_86.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/low_oil/low_oil_76.wav,low_oil_76.wav,idle state,low_oil,44100,1.5,1,1,Anomaly,3,Idle Fault,3,Low Oil
+car_diagnostics_dataset/braking state/worn_out_brakes/worn_out_brakes_11.wav,worn_out_brakes_11.wav,braking state,worn_out_brakes,44100,1.5,1,1,Anomaly,1,Braking Fault,1,Worn Brakes
+car_diagnostics_dataset/idle state/combined/power steering combined_no oil_serpentine belt/mix_57.wav,mix_57.wav,idle state,combined/power steering combined_no oil_serpentine belt,44100,1.5,1,1,Anomaly,3,Idle Fault,-1,EXCLUDED
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_77.wav,normal_engine_idle_77.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
+car_diagnostics_dataset/idle state/normal_engine_idle/normal_engine_idle_232.wav,normal_engine_idle_232.wav,idle state,normal_engine_idle,44100,1.5,1,0,Normal,2,Normal Idle,2,Normal Idle
