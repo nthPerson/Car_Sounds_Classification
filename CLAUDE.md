@@ -28,6 +28,7 @@ Car_Sounds/
 │   └── m6_dscnn_int8_qat/     # Depthwise separable CNN
 ├── results/                   # Evaluation figures, tables, reports
 ├── requirements.txt
+├── GETTING_STARTED.md         # Team guide: how to set up and run the project
 └── CLAUDE.md                  # This file
 ```
 
@@ -78,6 +79,10 @@ pip install -r requirements.txt
 - Preprocessing config is recorded in `data/preprocessing_config.json` when generated
 - Feature normalization statistics (mean/std) are computed from the training set ONLY
 - Use `sparse_categorical_crossentropy` for all classification tiers (including binary) for code uniformity
+
+## Getting Started Guide
+
+`GETTING_STARTED.md` in the project root is the team-facing guide for setting up and running the project. **When completing a development phase that adds new runnable steps** (e.g., a training script, an evaluation command, a deployment procedure), **update `GETTING_STARTED.md`** so teammates always have accurate, up-to-date instructions. Keep the language simple and non-technical where possible.
 
 ## Development Log
 
