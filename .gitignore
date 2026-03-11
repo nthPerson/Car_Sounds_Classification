@@ -1,5 +1,30 @@
 # Environment
-.venv
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
 
-# Datasets
-car_diagnostics_dataset
+# Datasets (large, downloaded separately)
+car_diagnostics_dataset/
+
+# Pre-computed features and data artifacts (regenerable)
+data/features/
+data/classical_ml_features/
+data/normalization_stats.npz
+
+# Trained models (large binary files)
+models/m1_classical/*.joblib
+models/m2_cnn2d_float32/*.h5
+models/m3_cnn2d_int8_ptq/*.tflite
+models/m4_cnn2d_int8_qat/*.tflite
+models/m5_cnn1d_int8_qat/*.tflite
+models/m6_dscnn_int8_qat/*.tflite
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
