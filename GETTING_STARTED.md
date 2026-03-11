@@ -2,6 +2,36 @@
 
 Welcome! This guide walks you through setting up and running the Car Sound Classification project. Follow each section in order.
 
+## Important: Branch Policy
+
+**Do not run scripts that generate files (preprocessing, training, etc.) or create new files while on the `main` branch.** Always create a Git branch for your work first. This prevents merge conflicts and keeps `main` clean.
+
+```bash
+# Create a branch before doing any work
+git checkout -b your-branch-name
+# ... or just use VScode's Source Control UI
+
+# When your work is ready, push and open a pull request to merge into main
+git push -u origin your-branch-name
+# ... or just use VScode's Source Control UI
+```
+
+If you are unfamiliar with Git branching, ask a teammate for help before running any scripts.
+
+## Project Documentation
+
+All of the project's technical specifications, architecture decisions, and planning documents live in the `docs/` folder. **Read these to understand the project goals, what has been done, and what still needs to be built:**
+
+| Document | What you'll learn |
+|----------|-------------------|
+| `docs/project_overview.md` | Project goals, scope, hardware constraints, and class taxonomy |
+| `docs/data_preprocessing_spec.md` | How audio data is processed and what features are extracted |
+| `docs/model_architecture_spec.md` | The six model variants we are building and how they differ |
+| `docs/quantization_deployment_spec.md` | How models get converted for the Arduino and deployed on-device |
+| `docs/evaluation_plan.md` | How we measure success (metrics, benchmarks, tests) |
+| `docs/development_roadmap.md` | The full 8-phase plan with task breakdowns and dependencies |
+| `docs/dev_log.md` | Running log of completed work, results, and decisions (start here to catch up) |
+
 ## Prerequisites
 
 - **Python 3.10+** installed on your machine
@@ -32,7 +62,7 @@ pip install -r requirements.txt
 ## 4. Download the Dataset
 
 1. Go to the [Car Diagnostics Dataset on Kaggle](https://www.kaggle.com/datasets/malakragaie/car-diagnostics-dataset).
-2. Download and unzip it so that the audio files are inside `car_diagnostics_dataset/` at the project root.
+2. Download and unzip it so that the audio files are inside `car_diagnostics_dataset/` at the project root. Replace the spaces with underscores in the name of the directory.
 
 Your folder should look like:
 
@@ -52,7 +82,7 @@ This script checks that all 1,386 audio files are present and generates the trai
 python project_setup/verify_dataset_and_split.py
 ```
 
-> **Note:** The split manifests are already committed to the repo. Only re-run this if you intentionally want to regenerate them.
+> **Note:** The split manifests are already committed to the repo. Only re-run this if you intentionally want to regenerate them, and do not run it on the main branch.
 
 ## 6. Run the Preprocessing Pipeline (Phase 1)
 
