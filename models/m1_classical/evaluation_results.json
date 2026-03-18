@@ -1,0 +1,143 @@
+{
+  "models": {
+    "rf_tier1": {
+      "accuracy": 0.8990384615384616,
+      "f1_macro": 0.8724261806711645,
+      "f1_weighted": 0.8965172980878756,
+      "cv_f1_macro": 0.8899382034170282,
+      "best_params": {
+        "n_estimators": 100,
+        "min_samples_split": 10,
+        "min_samples_leaf": 4,
+        "max_features": 0.3,
+        "max_depth": null,
+        "class_weight": "balanced"
+      }
+    },
+    "svm_tier1": {
+      "accuracy": 0.9326923076923077,
+      "f1_macro": 0.9163218390804597,
+      "f1_weighted": 0.9316246684350133,
+      "cv_f1_macro": 0.9243997841920508,
+      "best_params": {
+        "svc__C": 100,
+        "svc__gamma": "scale",
+        "svc__kernel": "rbf"
+      }
+    },
+    "rf_tier2": {
+      "accuracy": 0.8413461538461539,
+      "f1_macro": 0.6794464454316592,
+      "f1_weighted": 0.8271550204350072,
+      "cv_f1_macro": 0.7245913174402097,
+      "best_params": {
+        "n_estimators": 200,
+        "min_samples_split": 10,
+        "min_samples_leaf": 4,
+        "max_features": "sqrt",
+        "max_depth": 10,
+        "class_weight": "balanced_subsample"
+      }
+    },
+    "svm_tier2": {
+      "accuracy": 0.8509615384615384,
+      "f1_macro": 0.6991703619986449,
+      "f1_weighted": 0.8422491576454281,
+      "cv_f1_macro": 0.775305220887665,
+      "best_params": {
+        "svc__C": 10,
+        "svc__gamma": 0.001,
+        "svc__kernel": "rbf"
+      }
+    },
+    "rf_tier3": {
+      "accuracy": 0.7622377622377622,
+      "f1_macro": 0.7018884461863761,
+      "f1_weighted": 0.7522365676372894,
+      "cv_f1_macro": 0.777770201205958,
+      "best_params": {
+        "n_estimators": 500,
+        "min_samples_split": 2,
+        "min_samples_leaf": 2,
+        "max_features": 0.3,
+        "max_depth": null,
+        "class_weight": "balanced"
+      }
+    },
+    "svm_tier3": {
+      "accuracy": 0.7552447552447552,
+      "f1_macro": 0.710593529104157,
+      "f1_weighted": 0.7493684793346855,
+      "cv_f1_macro": 0.7916504976439296,
+      "best_params": {
+        "svc__C": 10,
+        "svc__gamma": "scale",
+        "svc__kernel": "rbf"
+      }
+    },
+    "rf_tier2_top50": {
+      "accuracy": 0.8125,
+      "f1_macro": 0.6723890157183973,
+      "f1_weighted": 0.8124196301320217
+    }
+  },
+  "feature_importance": {
+    "top50_names": [
+      "delta2_mfcc_0_std",
+      "mfcc_0_std",
+      "delta_mfcc_0_min",
+      "delta2_mfcc_0_max",
+      "delta_mfcc_0_std",
+      "mfcc_1_std",
+      "spectral_centroid_mean",
+      "rms_min",
+      "spectral_centroid_median",
+      "delta2_mfcc_0_min",
+      "mfcc_1_min",
+      "spectral_contrast_2_mean",
+      "delta2_mfcc_1_std",
+      "mfcc_4_max",
+      "spectral_centroid_min",
+      "delta_mfcc_1_mean",
+      "mfcc_12_std",
+      "spectral_centroid_max",
+      "spectral_rolloff_median",
+      "zcr_std",
+      "zcr_max",
+      "zcr_mean",
+      "spectral_contrast_5_std",
+      "spectral_rolloff_mean",
+      "mfcc_4_mean",
+      "zcr_median",
+      "delta2_mfcc_0_kurtosis",
+      "delta_mfcc_0_max",
+      "spectral_rolloff_min",
+      "mfcc_1_max",
+      "mfcc_4_median",
+      "mfcc_1_median",
+      "mfcc_12_min",
+      "mfcc_1_mean",
+      "mfcc_0_min",
+      "chroma_3_std",
+      "delta_mfcc_1_max",
+      "spectral_contrast_2_median",
+      "spectral_contrast_4_median",
+      "delta_mfcc_1_std",
+      "spectral_bandwidth_std",
+      "rms_std",
+      "delta2_mfcc_1_min",
+      "delta_mfcc_1_skewness",
+      "mfcc_2_mean",
+      "mfcc_2_max",
+      "mfcc_5_std",
+      "chroma_0_min",
+      "spectral_centroid_std",
+      "mfcc_0_max"
+    ],
+    "reduced_model_metrics": {
+      "accuracy": 0.8125,
+      "f1_macro": 0.6723890157183973,
+      "f1_weighted": 0.8124196301320217
+    }
+  }
+}

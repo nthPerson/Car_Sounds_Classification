@@ -102,9 +102,32 @@ python src/run_preprocessing.py
 | Normalization stats | `data/normalization_stats.npz` |
 | Config record | `data/preprocessing_config.json` |
 
+## 7. Train Classical ML Baselines (Phase 2)
+
+This trains Random Forest and SVM models on all 3 taxonomy tiers using the pre-computed 441-dim feature vectors.
+
+```bash
+python src/train_classical.py
+```
+
+**What it produces:**
+
+| Output | Location |
+|--------|----------|
+| Trained models (6 total) | `models/m1_classical/{rf,svm}_tier{1,2,3}.joblib` |
+| RF retrained on top-50 features | `models/m1_classical/rf_tier2_top50.joblib` |
+| Hyperparameter search results | `models/m1_classical/search_results.json` |
+| Evaluation metrics | `models/m1_classical/evaluation_results.json` |
+| Confusion matrices | `results/cm_*.png` |
+| Feature importance chart | `results/feature_importance_tier2.png` |
+| ROC curves (Tier 1) | `results/roc_*.png` |
+| Summary table | `results/classical_ml_summary.csv` |
+
+To explore the results interactively, open `notebooks/02_classical_ml.ipynb`.
+
 ## What's Next
 
-Later phases (model training, quantization, deployment) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
+Later phases (neural network training, quantization, deployment) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
 
 ## Troubleshooting
 
@@ -120,3 +143,4 @@ Later phases (model training, quantization, deployment) will be added to this gu
 | Install dependencies | `pip install -r requirements.txt` |
 | Verify dataset & splits | `python project_setup/verify_dataset_and_split.py` |
 | Run preprocessing | `python src/run_preprocessing.py` |
+| Train classical ML baselines | `python src/train_classical.py` |

@@ -4,6 +4,47 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-17 — Phase 2 Complete: Classical ML Baselines
+
+**What was done:**
+- Implemented `src/evaluate.py` — reusable evaluation utilities (metrics, confusion matrices, ROC curves, reporting). Shared by Phase 2 and all later phases.
+- Implemented `src/train_classical.py` — trains Random Forest (RandomizedSearchCV, n_iter=100) and SVM (GridSearchCV, Pipeline with StandardScaler) on all 3 taxonomy tiers with 5-fold stratified CV, f1_macro scoring.
+- Created `notebooks/02_classical_ml.ipynb` — analysis notebook with comparison tables, confusion matrices, feature importance, ROC curves.
+- Feature importance analysis: top-50 features identified from Tier 2 RF, retrained reduced-feature model.
+
+**Test set results:**
+
+| Model | Accuracy | F1 Macro | F1 Weighted |
+|-------|----------|----------|-------------|
+| RF Tier 1 | 0.8990 | 0.8724 | 0.8965 |
+| SVM Tier 1 | 0.9327 | 0.9163 | 0.9316 |
+| RF Tier 2 | 0.8413 | 0.6794 | 0.8272 |
+| SVM Tier 2 | 0.8510 | 0.6992 | 0.8422 |
+| RF Tier 3 | 0.7622 | 0.7019 | 0.7522 |
+| SVM Tier 3 | 0.7552 | 0.7106 | 0.7494 |
+| RF Tier 2 (top-50) | 0.8125 | 0.6724 | 0.8124 |
+
+**Key observations:**
+- SVM outperforms RF on Tiers 1–2; RF slightly better on Tier 3
+- Tier 2 macro F1 is lower than accuracy suggests (~0.70 vs ~0.85) due to poor performance on minority classes — "Normal Start-Up" (9 test samples) is the hardest class for both models
+- Top features are MFCC-related: delta2_mfcc_0_std, mfcc_0_std, delta_mfcc_0_min, followed by spectral centroid and RMS energy
+- Reduced-feature RF (top-50) performs slightly worse, suggesting most of the 441 features contribute useful signal
+
+**Design decisions:**
+- Used RandomizedSearchCV (n_iter=100) for RF instead of exhaustive grid (648 combos) — practical with negligible accuracy loss
+- SVM wrapped in Pipeline(StandardScaler, SVC) so scaler is part of the saved model artifact
+- Merged train+val sets for CV-based training (1,178 samples for Tier 1/2, 806 for Tier 3) since classical ML uses CV for validation rather than a separate val set
+- SVC(probability=True) enabled for ROC curves and future comparison analysis
+
+**Output artifacts:**
+- 6 trained models + 1 reduced-feature variant in `models/m1_classical/`
+- Confusion matrices, ROC curves, feature importance chart in `results/`
+- Search results and evaluation metrics as JSON in `models/m1_classical/`
+
+**Status:** Phase 2 complete. Classical ML baselines established. Ready for Phase 3 (neural network training).
+
+---
+
 ## 2026-03-11 — Phase 1 Complete: Data Preprocessing Pipeline
 
 **What was done:**
