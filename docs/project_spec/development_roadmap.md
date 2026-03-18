@@ -214,6 +214,7 @@ Car_Sounds/
 - [ ] Training curves for all models
 - [ ] Test set evaluation metrics for all float32 models
 - [ ] `notebooks/03_neural_networks.ipynb`
+- [ ] Markdown docs/ file that documents models, hyperparameters, evaluation methods, and other details necessary for future research paper report. See docs/classical_ml_baselines.md for example structure.
 
 ---
 

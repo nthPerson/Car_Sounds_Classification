@@ -125,9 +125,32 @@ python src/train_classical.py
 
 To explore the results interactively, open `notebooks/02_classical_ml.ipynb`.
 
+## 8. Train Neural Network Models (Phase 3)
+
+This trains three neural network architectures (2-D CNN, 1-D CNN, DS-CNN) on all 3 taxonomy tiers. Includes a hyperparameter search on Tier 2 followed by full training of 9 models.
+
+```bash
+python src/train_nn.py
+```
+
+Requires TensorFlow 2.18 with GPU support. Runtime: ~14 minutes on GPU, ~2-4 hours on CPU.
+
+**What it produces:**
+
+| Output | Location |
+|--------|----------|
+| 9 trained float32 models | `models/m2_cnn2d_float32/`, `models/m5_cnn1d_int8_qat/`, `models/m6_dscnn_int8_qat/` |
+| Hyperparameter search results | `models/hyperparameter_search.json` |
+| Training curves | `results/training_curves_m{2,5,6}_tier{1,2,3}.png` |
+| Confusion matrices | `results/cm_m{2,5,6}_tier_{1,2,3}[_norm].png` |
+| ROC curves (Tier 1) | `results/roc_m{2,5,6}_tier_1.png` |
+| Summary table | `results/nn_summary.csv` |
+
+To explore the results interactively, open `notebooks/03_neural_networks.ipynb`.
+
 ## What's Next
 
-Later phases (neural network training, quantization, deployment) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
+Later phases (quantization, deployment) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
 
 ## Troubleshooting
 
@@ -144,3 +167,4 @@ Later phases (neural network training, quantization, deployment) will be added t
 | Verify dataset & splits | `python project_setup/verify_dataset_and_split.py` |
 | Run preprocessing | `python src/run_preprocessing.py` |
 | Train classical ML baselines | `python src/train_classical.py` |
+| Train neural networks | `python src/train_nn.py` |

@@ -4,6 +4,49 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-18 — Phase 3 Complete: Neural Network Training
+
+**What was done:**
+- Implemented `src/models.py` — three architecture definitions: M2 (compact 2-D CNN, ~14.6K params), M5 (1-D CNN on MFCCs, ~6.2K params), M6 (DS-CNN 32-ch, ~8.2K params)
+- Implemented `src/train_nn.py` — full training orchestrator with data loading, on-the-fly SpecAugment via custom Keras Sequence, structured hyperparameter search on Tier 2, training with early stopping and LR scheduling, test set evaluation
+- Created `notebooks/03_neural_networks.ipynb` — analysis notebook comparing NNs to classical baselines
+- Created `docs/neural_network_models.md` — research-paper documentation with architecture details, search results, and analysis
+- Required downgrade to TensorFlow 2.18.0 for GPU compatibility with RTX 2000 Ada (TF 2.21 cuDNN autotuner failures)
+
+**Hyperparameter search results (Tier 2):**
+
+| Architecture | Best LR | Best Dropout | Best Augmentation |
+|-------------|---------|-------------|-------------------|
+| M2 (2-D CNN) | 0.002 | 0.3 | Aggressive SpecAugment (F=10, T=15) |
+| M5 (1-D CNN) | 0.002 | 0.2 | None |
+| M6 (DS-CNN) | 0.0005 | N/A | Default SpecAugment |
+
+**Test set results:**
+
+| Model | Tier 1 (F1 Macro) | Tier 2 (F1 Macro) | Tier 3 (F1 Macro) |
+|-------|------------------|------------------|------------------|
+| M2 (2-D CNN) | 0.8679 | **0.6658** | **0.7150** |
+| M5 (1-D CNN) | **0.8748** | 0.6164 | 0.6163 |
+| M6 (DS-CNN) | 0.8580 | 0.5706 | 0.5997 |
+| Best Classical (SVM) | 0.9163 | 0.6992 | 0.7106 |
+
+**Key observations:**
+- NNs did not exceed classical ML baselines on Tiers 1–2, but M2 slightly exceeded on Tier 3 (0.715 vs 0.711)
+- With only 970 training samples and SpecAugment-only augmentation, classical hand-crafted features remain competitive
+- M2 (2-D CNN) is the best NN architecture across all tiers and the primary quantization candidate for Phase 4
+- M6 (DS-CNN) struggled significantly — training instability at LR ≥ 0.001, lowest accuracy across all tiers
+- "Normal Start-Up" recall improved from 11–22% (classical ML) to 55.6% (M2 NN), though still the weakest class
+- M5 (1-D CNN) is the safest deployment candidate due to small tensor arena (~20 KB) despite lower accuracy
+
+**Design decisions:**
+- SpecAugment only (no waveform augmentation) for speed; waveform aug can be added later if accuracy is insufficient
+- Hyperparameter search on Tier 2 first, then train all tiers with best config per architecture
+- TensorFlow 2.18.0 used instead of 2.21.0 due to cuDNN backend incompatibility with Ada Lovelace GPUs
+
+**Status:** Phase 3 complete. 9 float32 models trained and evaluated. Ready for Phase 4 (quantization).
+
+---
+
 ## 2026-03-17 — Phase 2 Complete: Classical ML Baselines
 
 **What was done:**

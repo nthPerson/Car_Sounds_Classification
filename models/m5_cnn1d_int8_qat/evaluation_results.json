@@ -1,0 +1,27 @@
+{
+  "m5_tier1": {
+    "accuracy": 0.8942307692307693,
+    "f1_macro": 0.874767378215654,
+    "f1_weighted": 0.8951802029388236,
+    "best_val_accuracy": 0.9278846383094788,
+    "epochs_trained": 41,
+    "training_time_s": 16.332536935806274,
+    "roc_auc": 0.9589606334337013
+  },
+  "m5_tier2": {
+    "accuracy": 0.7692307692307693,
+    "f1_macro": 0.6164399863122774,
+    "f1_weighted": 0.7821409793568344,
+    "best_val_accuracy": 0.879807710647583,
+    "epochs_trained": 99,
+    "training_time_s": 31.4599871635437
+  },
+  "m5_tier3": {
+    "accuracy": 0.6783216783216783,
+    "f1_macro": 0.6163279299084925,
+    "f1_weighted": 0.6836381593355823,
+    "best_val_accuracy": 0.7253521084785461,
+    "epochs_trained": 39,
+    "training_time_s": 15.527223110198975
+  }
+}
