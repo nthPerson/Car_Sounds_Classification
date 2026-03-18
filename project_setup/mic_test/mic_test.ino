@@ -1,9 +1,9 @@
 /*
  * PDM Microphone Test Sketch — Arduino Nano 33 BLE Sense Rev2
  *
- * Purpose: Verify that the on-board MP34DT06JTR PDM MEMS microphone is
- *          working correctly by capturing audio at 16 kHz and reporting
- *          basic statistics over Serial.
+ * Purpose: Interactively verify that the on-board MP34DT06JTR PDM MEMS
+ *          microphone is working correctly. Provides multiple visualization
+ *          modes for the Serial Monitor and Serial Plotter.
  *
  * Hardware: Arduino Nano 33 BLE Sense Rev2 (nRF52840)
  * Library:  PDM (built-in with Arduino Mbed OS Nano Boards package)
@@ -14,11 +14,26 @@
  *   3. Upload this sketch
  *   4. Open Serial Monitor at 115200 baud
  *
- * What it does:
- *   - Captures 1.5 seconds of audio (24,000 samples at 16 kHz)
- *   - Computes and prints: min, max, mean, RMS amplitude
- *   - Prints the first 100 raw samples for visual inspection
- *   - Repeats every cycle (with a pause between captures)
+ * Interactive modes (send a command via Serial Monitor):
+ *
+ *   w — WAVEFORM   Live raw audio samples for Serial Plotter (real-time
+ *                   waveform). Open Tools > Serial Plotter to see the wave.
+ *
+ *   l — LEVEL      Streams RMS level over time for Serial Plotter. Shows a
+ *                   smoothed loudness curve — good for verifying the mic
+ *                   responds to sound at different distances/volumes.
+ *
+ *   v — VU METER   ASCII bar-graph volume meter in Serial Monitor. Visual
+ *                   real-time feedback without needing Serial Plotter.
+ *
+ *   s — STATS      Batch capture of 1.5 s (matches dataset clip length),
+ *                   then prints min/max/mean/RMS and first 100 raw samples.
+ *                   This is the original diagnostic mode.
+ *
+ *   g — GAIN       Cycle the PDM gain through 10 / 20 / 40 / 60 so you can
+ *                   find the best setting for your environment.
+ *
+ *   h — HELP       Re-print the command menu.
  *
  * Expected output for a working microphone:
  *   - Silence: RMS ~50–200 (background noise floor)
@@ -33,104 +48,234 @@
 #define AUDIO_DURATION_MS 1500     // 1.5 seconds — matches dataset clip length
 #define AUDIO_SAMPLES     (SAMPLE_RATE * AUDIO_DURATION_MS / 1000)  // 24000
 #define NUM_CHANNELS      1        // Mono
-#define PRINT_RAW_SAMPLES 100      // How many raw samples to print per capture
 
-// ---- Audio buffer ----
-// 24,000 samples × 2 bytes = 48,000 bytes (48 KB)
-// This is the same buffer size the final classifier will use.
+// Small ring buffer for streaming modes (waveform / level / VU).
+// PDM delivers samples in chunks; we process them in the main loop.
+#define STREAM_BUF_SIZE   512
+int16_t streamBuf[STREAM_BUF_SIZE];
+volatile int streamSamplesReady = 0;
+
+// Large buffer used only in STATS mode (batch capture).
 int16_t audioBuffer[AUDIO_SAMPLES];
-volatile int samplesRead = 0;
+volatile int batchSamplesRead = 0;
 volatile bool captureComplete = false;
+
+// ---- Mode enum ----
+enum Mode { MODE_WAVEFORM, MODE_LEVEL, MODE_VU, MODE_STATS, MODE_IDLE };
+volatile Mode currentMode = MODE_IDLE;
+
+// ---- Gain settings ----
+const int gainSteps[] = {10, 20, 40, 60};
+const int numGainSteps = sizeof(gainSteps) / sizeof(gainSteps[0]);
+int gainIndex = 1;  // default 20
 
 // ---- PDM callback ----
 // Called by the PDM library when new samples are available.
 // Runs in interrupt context — keep it fast, no Serial prints here.
 void onPDMdata() {
   int bytesAvailable = PDM.available();
-  int samplesToRead = bytesAvailable / sizeof(int16_t);
+  int samples = bytesAvailable / sizeof(int16_t);
 
-  // Don't overflow the buffer
-  if (samplesRead + samplesToRead > AUDIO_SAMPLES) {
-    samplesToRead = AUDIO_SAMPLES - samplesRead;
-  }
-
-  if (samplesToRead > 0) {
-    PDM.read(&audioBuffer[samplesRead], samplesToRead * sizeof(int16_t));
-    samplesRead += samplesToRead;
-  }
-
-  if (samplesRead >= AUDIO_SAMPLES) {
-    captureComplete = true;
+  if (currentMode == MODE_STATS) {
+    // Batch capture into the large buffer
+    if (batchSamplesRead + samples > AUDIO_SAMPLES) {
+      samples = AUDIO_SAMPLES - batchSamplesRead;
+    }
+    if (samples > 0) {
+      PDM.read(&audioBuffer[batchSamplesRead], samples * sizeof(int16_t));
+      batchSamplesRead += samples;
+    }
+    if (batchSamplesRead >= AUDIO_SAMPLES) {
+      captureComplete = true;
+    }
+  } else {
+    // Streaming modes: read into the small ring buffer
+    if (samples > STREAM_BUF_SIZE) samples = STREAM_BUF_SIZE;
+    PDM.read(streamBuf, samples * sizeof(int16_t));
+    streamSamplesReady = samples;
   }
 }
 
-void setup() {
-  Serial.begin(115200);
-  while (!Serial) {
-    ; // Wait for Serial Monitor to connect (USB CDC)
-  }
+// ---- Helpers ----
 
+void printMenu() {
+  Serial.println();
   Serial.println("==========================================");
-  Serial.println("  PDM Microphone Test");
+  Serial.println("  PDM Microphone Test — Interactive");
   Serial.println("  Arduino Nano 33 BLE Sense Rev2");
   Serial.println("==========================================");
-  Serial.print("Sample rate:     ");
+  Serial.println();
+  Serial.println("Commands (send via Serial Monitor):");
+  Serial.println("  w  Waveform — live audio for Serial Plotter");
+  Serial.println("  l  Level    — RMS loudness for Serial Plotter");
+  Serial.println("  v  VU meter — ASCII bar in Serial Monitor");
+  Serial.println("  s  Stats    — batch 1.5 s capture + statistics");
+  Serial.println("  g  Gain     — cycle mic gain (10/20/40/60)");
+  Serial.println("  h  Help     — show this menu");
+  Serial.println();
+  Serial.print("Current gain: ");
+  Serial.println(gainSteps[gainIndex]);
+  Serial.print("Sample rate:  ");
   Serial.print(SAMPLE_RATE);
   Serial.println(" Hz");
-  Serial.print("Capture duration: ");
-  Serial.print(AUDIO_DURATION_MS);
-  Serial.println(" ms");
-  Serial.print("Buffer size:     ");
-  Serial.print(AUDIO_SAMPLES);
-  Serial.print(" samples (");
-  Serial.print(AUDIO_SAMPLES * 2);
-  Serial.println(" bytes)");
   Serial.println();
-
-  // Register the PDM data callback
-  PDM.onReceive(onPDMdata);
-
-  // Initialize PDM microphone
-  // Arguments: number of channels, sample rate
-  if (!PDM.begin(NUM_CHANNELS, SAMPLE_RATE)) {
-    Serial.println("ERROR: Failed to initialize PDM microphone!");
-    Serial.println("Check that you are using an Arduino Nano 33 BLE Sense (Rev2).");
-    while (1) {
-      ; // Halt — nothing to do without a microphone
-    }
-  }
-
-  // Optional: set the PDM gain (default is 20, range ~0-80)
-  // Higher gain = more sensitive, but also more noise
-  PDM.setGain(20);
-
-  Serial.println("PDM microphone initialized successfully.");
-  Serial.println("Starting audio capture...");
-  Serial.println();
+  Serial.println("Waiting for command...");
 }
 
-void loop() {
-  // ---- 1. Start a new capture ----
+void printBar(int level, int maxLevel, int barWidth) {
+  // Scale level to bar width
+  int filled = (long)level * barWidth / maxLevel;
+  if (filled > barWidth) filled = barWidth;
+  if (filled < 0) filled = 0;
+
+  Serial.print("[");
+  for (int i = 0; i < barWidth; i++) {
+    if (i < filled) Serial.print("#");
+    else Serial.print(" ");
+  }
+  Serial.print("] ");
+}
+
+// ---- Mode: Waveform (Serial Plotter) ----
+// Streams raw int16 samples, one per line. The Serial Plotter renders
+// these as a real-time waveform — the most direct view of what the mic hears.
+
+void runWaveform() {
+  Serial.println("WAVEFORM mode — open Serial Plotter (Ctrl+Shift+L)");
+  Serial.println("Send any character to stop.");
+  delay(500);
+
+  while (true) {
+    if (Serial.available()) { Serial.read(); break; }
+
+    if (streamSamplesReady > 0) {
+      int n = streamSamplesReady;
+      streamSamplesReady = 0;
+      // Print every 4th sample to avoid overwhelming Serial at 115200 baud.
+      // Effective plot rate: ~4000 points/s which Serial Plotter handles well.
+      for (int i = 0; i < n; i += 4) {
+        Serial.println(streamBuf[i]);
+      }
+    }
+  }
+}
+
+// ---- Mode: Level meter (Serial Plotter) ----
+// Computes RMS over each incoming PDM chunk and prints it as a single value
+// per line. Serial Plotter shows a smooth loudness curve over time.
+
+void runLevel() {
+  Serial.println("LEVEL mode — open Serial Plotter (Ctrl+Shift+L)");
+  Serial.println("Send any character to stop.");
+  delay(500);
+
+  // Print header labels for Serial Plotter legend
+  Serial.println("RMS\tPeak");
+
+  while (true) {
+    if (Serial.available()) { Serial.read(); break; }
+
+    if (streamSamplesReady > 0) {
+      int n = streamSamplesReady;
+      streamSamplesReady = 0;
+
+      int64_t sumSq = 0;
+      int16_t peak = 0;
+      for (int i = 0; i < n; i++) {
+        int16_t s = streamBuf[i];
+        sumSq += (int64_t)s * s;
+        int16_t absS = abs(s);
+        if (absS > peak) peak = absS;
+      }
+      float rms = sqrt((float)sumSq / n);
+
+      // Two tab-separated columns for Serial Plotter
+      Serial.print(rms, 0);
+      Serial.print("\t");
+      Serial.println(peak);
+    }
+  }
+}
+
+// ---- Mode: VU meter (Serial Monitor) ----
+// Prints an ASCII bar graph that updates in-place, giving real-time visual
+// feedback without needing Serial Plotter.
+
+void runVU() {
+  Serial.println("VU METER mode — watch the bar graph below.");
+  Serial.println("Send any character to stop.");
+  Serial.println();
+  delay(500);
+
+  const int barWidth = 50;
+  const int maxRMS = 6000;  // clips above this
+
+  while (true) {
+    if (Serial.available()) { Serial.read(); break; }
+
+    if (streamSamplesReady > 0) {
+      int n = streamSamplesReady;
+      streamSamplesReady = 0;
+
+      int64_t sumSq = 0;
+      for (int i = 0; i < n; i++) {
+        int16_t s = streamBuf[i];
+        sumSq += (int64_t)s * s;
+      }
+      float rms = sqrt((float)sumSq / n);
+
+      // Determine signal label
+      const char* label;
+      if (rms < 5)        label = "NO SIGNAL";
+      else if (rms < 100) label = "quiet";
+      else if (rms < 500) label = "low";
+      else if (rms < 2000) label = "moderate";
+      else if (rms < 4000) label = "loud";
+      else                  label = "LOUD!";
+
+      printBar((int)rms, maxRMS, barWidth);
+      Serial.print("RMS: ");
+      Serial.print(rms, 0);
+      Serial.print("  ");
+      Serial.println(label);
+    }
+
+    delay(50);  // ~20 updates/sec — readable in Serial Monitor
+  }
+}
+
+// ---- Mode: Stats (batch capture — original behavior) ----
+// Captures a full 1.5-second clip (matching our dataset clip length) and
+// prints comprehensive statistics. Useful for one-shot verification.
+
+void runStats() {
   captureComplete = false;
-  samplesRead = 0;
+  batchSamplesRead = 0;
   memset(audioBuffer, 0, sizeof(audioBuffer));
 
   Serial.println("--- Capturing 1.5 seconds of audio... ---");
   unsigned long captureStart = millis();
 
-  // Wait for the buffer to fill (blocking)
+  currentMode = MODE_STATS;
+
   while (!captureComplete) {
-    // The PDM callback fills the buffer in the background.
-    // At 16 kHz, 24,000 samples takes exactly 1.5 seconds.
+    if (Serial.available()) {
+      Serial.read();
+      Serial.println("(Capture interrupted)");
+      currentMode = MODE_IDLE;
+      return;
+    }
     delay(10);
   }
+
+  currentMode = MODE_IDLE;
 
   unsigned long captureEnd = millis();
   Serial.print("Capture complete in ");
   Serial.print(captureEnd - captureStart);
   Serial.println(" ms");
 
-  // ---- 2. Compute statistics ----
+  // Compute statistics
   int16_t minVal = 32767;
   int16_t maxVal = -32768;
   int64_t sum = 0;
@@ -161,7 +306,7 @@ void loop() {
   Serial.print("  RMS amplitude: ");
   Serial.println(rms, 1);
 
-  // ---- 3. Assess signal quality ----
+  // Assess signal quality
   Serial.println();
   if (rms < 5) {
     Serial.println("WARNING: RMS is extremely low. Microphone may not be working.");
@@ -174,22 +319,103 @@ void loop() {
     Serial.println("Signal: LOUD — strong audio detected");
   }
 
-  // ---- 4. Print raw samples for inspection ----
+  // Print raw samples for inspection
+  const int printCount = 100;
   Serial.println();
   Serial.print("First ");
-  Serial.print(PRINT_RAW_SAMPLES);
+  Serial.print(printCount);
   Serial.println(" raw samples:");
-  for (int i = 0; i < PRINT_RAW_SAMPLES && i < AUDIO_SAMPLES; i++) {
+  for (int i = 0; i < printCount && i < AUDIO_SAMPLES; i++) {
     Serial.print(audioBuffer[i]);
-    if (i < PRINT_RAW_SAMPLES - 1) Serial.print(", ");
-    if ((i + 1) % 20 == 0) Serial.println();  // Line break every 20 samples
+    if (i < printCount - 1) Serial.print(", ");
+    if ((i + 1) % 20 == 0) Serial.println();
   }
   Serial.println();
+}
 
-  // ---- 5. Pause before next capture ----
-  Serial.println();
-  Serial.println("Waiting 3 seconds before next capture...");
-  Serial.println("==========================================");
-  Serial.println();
-  delay(3000);
+// ---- Gain cycling ----
+
+void cycleGain() {
+  gainIndex = (gainIndex + 1) % numGainSteps;
+  PDM.setGain(gainSteps[gainIndex]);
+  Serial.print("Gain set to: ");
+  Serial.println(gainSteps[gainIndex]);
+}
+
+// ---- Arduino setup ----
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial) {
+    ; // Wait for Serial Monitor to connect (USB CDC)
+  }
+
+  // Register the PDM data callback
+  PDM.onReceive(onPDMdata);
+
+  // Initialize PDM microphone
+  if (!PDM.begin(NUM_CHANNELS, SAMPLE_RATE)) {
+    Serial.println("ERROR: Failed to initialize PDM microphone!");
+    Serial.println("Check that you are using an Arduino Nano 33 BLE Sense (Rev2).");
+    while (1) {
+      ; // Halt
+    }
+  }
+
+  PDM.setGain(gainSteps[gainIndex]);
+
+  printMenu();
+}
+
+// ---- Arduino main loop ----
+
+void loop() {
+  if (Serial.available()) {
+    char cmd = Serial.read();
+
+    // Consume any trailing newline/carriage return
+    delay(10);
+    while (Serial.available()) Serial.read();
+
+    switch (cmd) {
+      case 'w': case 'W':
+        currentMode = MODE_WAVEFORM;
+        runWaveform();
+        currentMode = MODE_IDLE;
+        printMenu();
+        break;
+
+      case 'l': case 'L':
+        currentMode = MODE_LEVEL;
+        runLevel();
+        currentMode = MODE_IDLE;
+        printMenu();
+        break;
+
+      case 'v': case 'V':
+        currentMode = MODE_VU;
+        runVU();
+        currentMode = MODE_IDLE;
+        printMenu();
+        break;
+
+      case 's': case 'S':
+        runStats();
+        Serial.println();
+        Serial.println("Send another command (h for help).");
+        break;
+
+      case 'g': case 'G':
+        cycleGain();
+        break;
+
+      case 'h': case 'H':
+        printMenu();
+        break;
+
+      default:
+        // Ignore stray characters (newlines, etc.)
+        break;
+    }
+  }
 }
