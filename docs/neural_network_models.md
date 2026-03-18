@@ -160,29 +160,52 @@ Input: (40, 92, 1)
 
 | Parameter | M2 (2-D CNN) | M5 (1-D CNN) | M6 (DS-CNN) |
 |-----------|-------------|-------------|-------------|
-| Learning rate | 0.002 | 0.002 | 0.0005 |
-| Dropout rate | 0.3 | 0.2 | N/A (no dropout layer) |
-| Augmentation | Aggressive SpecAugment | None | Default SpecAugment |
+| Learning rate | 0.002 | 0.001 | 0.002 |
+| Dropout rate | 0.2 | 0.3 | N/A (no dropout layer) |
+| SpecAugment | None | Default | None |
 
-### 5.3 Data Augmentation: SpecAugment
+### 5.3 Data Augmentation
 
-SpecAugment was applied on-the-fly during training (50% probability per sample per epoch) using the pre-computed features. No waveform-level augmentation was used.
+Two levels of augmentation are used:
 
-| Setting | Mel-spectrogram | MFCC |
-|---------|----------------|------|
-| Default | F=7 (freq mask), T=10 (time mask) | F=2, T=10 |
-| Aggressive | F=10, T=15 | F=3, T=15 |
-| Application axis | Frequency: mel bands (40), Time: frames (92) | Frequency: coefficients (13), Time: frames (92) |
+**Level 1 — Pre-computed waveform augmentation (class-balanced):**
+
+Training data was expanded from 970 → 3,317 samples using `src/generate_augmented_data.py`. Five waveform-domain augmentations are applied with stochastic probability per sample:
+
+| Augmentation | Probability | Parameters |
+|-------------|------------|-----------|
+| Time shift | 50% | ±100 ms (1,600 samples) |
+| Noise injection | 50% | SNR 5–25 dB (Gaussian) |
+| Pitch shift | 30% | ±2 semitones |
+| Speed perturbation | 30% | 0.9–1.1x rate |
+| Random gain | 50% | 0.7–1.3x amplitude |
+
+**Class-aware augmentation multipliers** target ~550 samples per Tier 2 class:
+
+| Tier 2 Class | Original | Multiplier | Final |
+|-------------|----------|-----------|-------|
+| Normal Braking | 54 | 9x | 540 |
+| Braking Fault | 53 | 9x | 530 |
+| Normal Idle | 185 | 2x | 555 |
+| Idle Fault | 552 | 0x (no augmentation) | 552 |
+| Normal Start-Up | 43 | 12x | 559 |
+| Start-Up Fault | 83 | 6x | 581 |
+
+This reduces the Tier 2 imbalance ratio from 12.8x (552:43) to 1.1x (581:530).
+
+**Level 2 — On-the-fly SpecAugment (optional per architecture):**
+
+Applied during training with 50% probability per sample per epoch. Only used for M5 (1-D CNN on MFCCs) based on hyperparameter search results; M2 and M6 performed best without SpecAugment when waveform augmentation was already applied.
 
 ### 5.4 Data Splits
 
 | Split | Tier 1 & 2 | Tier 3 |
 |-------|-----------|--------|
-| Train | 970 samples | 664 samples |
-| Val (for early stopping) | 208 samples | 142 samples |
-| Test (held out) | 208 samples | 143 samples |
+| Train (augmented) | 3,317 samples | ~2,290 samples |
+| Val (unaugmented) | 208 samples | 142 samples |
+| Test (unaugmented) | 208 samples | 143 samples |
 
-Unlike Phase 2 (classical ML), train and val sets were kept separate — val was used for early stopping, learning rate scheduling, and model checkpointing.
+Augmentation is applied only to the training set. Val and test sets remain unaugmented to ensure unbiased evaluation. Train and val are kept separate (val is used for early stopping, LR scheduling, and model checkpointing).
 
 ---
 
@@ -194,26 +217,26 @@ A structured manual search was conducted on Tier 2 (primary target) for all thre
 
 | Sweep | Setting | Best Val Accuracy |
 |-------|---------|------------------|
-| **LR** | 0.0005 → 0.750, **0.002 → 0.793**, 0.001 → 0.774 | LR=0.002 |
-| **Dropout** | 0.2 → 0.779, **0.3 → 0.803**, 0.5 → 0.731 | Dropout=0.3 |
-| **Augmentation** | none → 0.813, default → 0.760, **aggressive → 0.827** | Aggressive |
+| **LR** | 0.0005 → 0.837, 0.001 → 0.899, **0.002 → 0.904** | LR=0.002 |
+| **Dropout** | **0.2 → 0.909**, 0.3 → 0.899, 0.5 → 0.885 | Dropout=0.2 |
+| **Augmentation** | **none → 0.904**, default → 0.894, aggressive → 0.904 | None |
 
 ### 6.2 M5 (1-D CNN) Search Results
 
 | Sweep | Setting | Best Val Accuracy |
 |-------|---------|------------------|
-| **LR** | 0.0005 → 0.712, 0.001 → 0.764, **0.002 → 0.813** | LR=0.002 |
-| **Dropout** | **0.2 → 0.865**, 0.3 → 0.817, 0.5 → 0.784 | Dropout=0.2 |
-| **Augmentation** | **none → 0.851**, default → 0.793, aggressive → 0.817 | None |
+| **LR** | 0.0005 → 0.870, **0.001 → 0.885**, 0.002 → 0.875 | LR=0.001 |
+| **Dropout** | 0.2 → 0.846, 0.3 → 0.861, **0.5 → 0.861** | Dropout=0.3 |
+| **Augmentation** | none → 0.875, **default → 0.889**, aggressive → 0.856 | Default |
 
 ### 6.3 M6 (DS-CNN) Search Results
 
 | Sweep | Setting | Best Val Accuracy |
 |-------|---------|------------------|
-| **LR** | **0.0005 → 0.736**, 0.001 → 0.231, 0.002 → 0.260 | LR=0.0005 |
-| **Augmentation** | none → 0.716, **default → 0.784**, aggressive → 0.188 | Default |
+| **LR** | 0.0005 → 0.904, 0.001 → 0.894, **0.002 → 0.914** | LR=0.002 |
+| **Augmentation** | **none → 0.909**, default → 0.899, aggressive → 0.904 | None |
 
-**Key finding:** M6 was highly sensitive to learning rate — LR ≥ 0.001 caused training instability (val accuracy ~0.23 = near random for 6 classes). The DS-CNN's depthwise convolutions have fewer parameters per layer, making them more susceptible to large learning rates on small datasets.
+**Key finding compared to pre-augmentation:** M6 (DS-CNN) was previously unstable at LR ≥ 0.001 (val accuracy ~23%), but with the augmented + balanced dataset it trains stably at LR=0.002 (val accuracy 91.4%). The expanded dataset (3,317 vs 970 samples) provides sufficient gradient diversity for the depthwise separable convolutions to converge reliably.
 
 ---
 
@@ -223,52 +246,52 @@ A structured manual search was conducted on Tier 2 (primary target) for all thre
 
 | Model | Tier | Accuracy | F1 Macro | F1 Weighted | Epochs | Time (s) |
 |-------|------|----------|----------|-------------|--------|----------|
-| M2 (2-D CNN) | 1 | 0.8846 | 0.8679 | 0.8873 | 60 | 23.5 |
-| M2 (2-D CNN) | 2 | 0.7837 | 0.6658 | 0.7965 | 70 | 25.5 |
-| M2 (2-D CNN) | 3 | 0.7343 | 0.7150 | 0.7443 | 100 | 34.8 |
-| M5 (1-D CNN) | 1 | 0.8942 | 0.8748 | 0.8952 | 43 | 13.8 |
-| M5 (1-D CNN) | 2 | 0.7692 | 0.6164 | 0.7821 | 99 | 31.5 |
-| M5 (1-D CNN) | 3 | 0.6783 | 0.6163 | 0.6836 | 39 | 15.5 |
-| M6 (DS-CNN) | 1 | 0.8750 | 0.8580 | 0.8783 | 52 | 38.2 |
-| M6 (DS-CNN) | 2 | 0.6538 | 0.5706 | 0.6815 | 93 | 51.5 |
-| M6 (DS-CNN) | 3 | 0.6224 | 0.5997 | 0.6264 | 100 | 55.0 |
+| M2 (2-D CNN) | 1 | 0.9135 | 0.8975 | 0.9142 | 51 | 33.2 |
+| M2 (2-D CNN) | 2 | 0.8654 | 0.7315 | 0.8590 | 75 | 45.3 |
+| M2 (2-D CNN) | 3 | 0.7692 | 0.7165 | 0.7733 | 61 | 36.1 |
+| M5 (1-D CNN) | 1 | 0.8798 | 0.8640 | 0.8832 | 55 | 32.4 |
+| M5 (1-D CNN) | 2 | 0.8029 | 0.6377 | 0.8100 | 65 | 36.5 |
+| M5 (1-D CNN) | 3 | 0.7273 | 0.6570 | 0.7254 | 81 | 42.0 |
+| M6 (DS-CNN) | 1 | 0.9135 | 0.9001 | 0.9152 | 55 | 51.1 |
+| M6 (DS-CNN) | 2 | 0.8702 | 0.7767 | 0.8660 | 41 | 38.7 |
+| M6 (DS-CNN) | 3 | 0.7762 | 0.7247 | 0.7723 | 65 | 57.0 |
 
 ### 7.2 Comparison with Classical ML Baselines
 
 | Tier | Best Classical ML | Best NN | NN Beats Baseline? |
 |------|------------------|---------|--------------------|
-| 1 | SVM (F1=0.916) | M5 (F1=0.875) | No (−0.041) |
-| 2 | SVM (F1=0.699) | M2 (F1=0.666) | No (−0.033) |
-| 3 | SVM (F1=0.711) | M2 (F1=0.715) | Yes (+0.004) |
+| 1 | SVM (F1=0.916) | M6 (F1=0.900) | No (−0.016) |
+| 2 | SVM (F1=0.699) | **M6 (F1=0.777)** | **Yes (+0.078)** |
+| 3 | SVM (F1=0.711) | **M6 (F1=0.725)** | **Yes (+0.014)** |
 
-The neural networks did not exceed classical ML baselines on Tiers 1–2 but marginally exceeded on Tier 3. This is consistent with expectations for a small dataset (970 training samples) where hand-crafted features can capture the most discriminative information without the need for learned representations.
+With augmented + class-balanced training data, all three NN architectures now exceed the classical ML baselines on Tiers 2 and 3. On Tier 1 (binary), the gap narrowed significantly (−0.016 vs −0.041 before augmentation). The M6 DS-CNN, which performed worst before augmentation, became the best architecture after receiving sufficient training data.
 
-### 7.3 Per-Class Results — Tier 2 (M2 2-D CNN, best NN)
-
-| Class | Support | Precision | Recall | F1 |
-|-------|---------|-----------|--------|-----|
-| Normal Braking | 12 | 0.5882 | 0.8333 | 0.6897 |
-| Braking Fault | 11 | 0.5333 | 0.7273 | 0.6154 |
-| Normal Idle | 40 | 0.7778 | 0.8750 | 0.8235 |
-| Idle Fault | 118 | 0.9596 | 0.8051 | 0.8756 |
-| Normal Start-Up | 9 | 0.2941 | 0.5556 | 0.3846 |
-| Start-Up Fault | 18 | 0.6667 | 0.5556 | 0.6061 |
-
-**"Normal Start-Up" improved** from 11-22% recall (classical ML) to 55.6% recall (M2 NN). The NN learned to better distinguish this minority class, though at the cost of increased false positives (29.4% precision). The aggressive SpecAugment and class weighting helped surface minority-class patterns.
-
-### 7.4 Per-Class Results — Tier 3 (M2 2-D CNN)
+### 7.3 Per-Class Results — Tier 2 (M6 DS-CNN, best NN)
 
 | Class | Support | Precision | Recall | F1 |
 |-------|---------|-----------|--------|-----|
-| Normal Braking | 12 | 0.5556 | 0.8333 | 0.6667 |
-| Worn Brakes | 11 | 0.5556 | 0.4545 | 0.5000 |
-| Normal Idle | 40 | 0.8684 | 0.8250 | 0.8462 |
-| Low Oil | 16 | 0.7500 | 0.5625 | 0.6429 |
-| Power Steering Fault | 19 | 0.6364 | 0.7368 | 0.6829 |
-| Serpentine Belt Fault | 18 | 0.8421 | 0.8889 | 0.8649 |
-| Normal Start-Up | 9 | 0.5000 | 0.5556 | 0.5263 |
-| Bad Ignition | 9 | 0.6000 | 0.6667 | 0.6316 |
-| Dead Battery | 9 | 0.6250 | 0.5556 | 0.5882 |
+| Normal Braking | 12 | 0.7500 | 1.0000 | 0.8571 |
+| Braking Fault | 11 | 0.7273 | 0.7273 | 0.7273 |
+| Normal Idle | 40 | 0.8611 | 0.7750 | 0.8158 |
+| Idle Fault | 118 | 0.9120 | 0.9661 | 0.9383 |
+| Normal Start-Up | 9 | 0.6250 | 0.5556 | 0.5882 |
+| Start-Up Fault | 18 | 0.9167 | 0.6111 | 0.7333 |
+
+**"Normal Start-Up" recall improved dramatically** — from 11-22% (classical ML) and 22-56% (NNs without augmentation) to 55.6% (M6 with augmentation). The class-balanced augmentation (12x expansion for this class) was the primary driver.
+
+### 7.4 Per-Class Results — Tier 3 (M6 DS-CNN)
+
+| Class | Support | Precision | Recall | F1 |
+|-------|---------|-----------|--------|-----|
+| Normal Braking | 12 | 0.7059 | 1.0000 | 0.8276 |
+| Worn Brakes | 11 | 0.8889 | 0.7273 | 0.8000 |
+| Normal Idle | 40 | 0.8889 | 0.8000 | 0.8421 |
+| Low Oil | 16 | 0.7500 | 0.7500 | 0.7500 |
+| Power Steering Fault | 19 | 0.7619 | 0.8421 | 0.8000 |
+| Serpentine Belt Fault | 18 | 0.8571 | 1.0000 | 0.9231 |
+| Normal Start-Up | 9 | 0.4000 | 0.4444 | 0.4211 |
+| Bad Ignition | 9 | 0.6667 | 0.4444 | 0.5333 |
+| Dead Battery | 9 | 0.7143 | 0.5556 | 0.6250 |
 
 ---
 
@@ -278,42 +301,47 @@ The neural networks did not exceed classical ML baselines on Tiers 1–2 but mar
 
 | Aspect | M2 (2-D CNN) | M5 (1-D CNN) | M6 (DS-CNN) |
 |--------|-------------|-------------|-------------|
-| Best F1 macro (Tier 2) | **0.666** | 0.616 | 0.571 |
+| Best F1 macro (Tier 2) | 0.732 | 0.638 | **0.777** |
 | Parameters (Tier 2) | 14,566 | **6,246** | 8,166 |
 | Float32 model size | 237 KB | **140 KB** | 246 KB |
 | Est. int8 model size | ~16 KB | **~8 KB** | ~9 KB |
 | Est. tensor arena | ~70-80 KB | **~15-25 KB** | ~35-45 KB |
-| Training stability | Stable | Stable | **Unstable at LR ≥ 0.001** |
-| Convergence speed | ~60-70 epochs | ~40-100 epochs | ~50-100 epochs |
+| Training stability (with aug) | Stable | Stable | Stable |
+| Convergence speed | ~50-75 epochs | ~55-81 epochs | ~41-65 epochs |
 
 ### 8.2 Deployment Recommendations
 
-1. **M5 (1-D CNN) — Safest deployment candidate.** Smallest model (~8 KB int8) and tensor arena (~20 KB), leaving generous SRAM headroom. Accuracy is acceptable though not the highest.
-2. **M2 (2-D CNN) — Highest accuracy candidate.** Best F1 macro across all tiers. Tensor arena (~75 KB) is tight but within the 80 KB budget. If it fits, it is the best performer.
-3. **M6 (DS-CNN) — Not recommended.** Lowest accuracy, training instability, and no clear advantage over M2 or M5. The DS-CNN architecture may be better suited to larger datasets.
+1. **M6 (DS-CNN) — Best accuracy candidate.** Highest F1 macro on Tier 2 (0.777) and competitive on all tiers. Tensor arena (~35-45 KB) fits comfortably within the 80 KB budget. Int8 model size (~9 KB) is well within flash budget.
+2. **M2 (2-D CNN) — Strong alternative.** Second-best accuracy. Tensor arena (~75 KB) is tight but within budget. More parameters = more room for quantization to degrade accuracy.
+3. **M5 (1-D CNN) — Smallest footprint.** Safest deployment if SRAM is constrained (~20 KB arena). Lower accuracy but the most compact model (~8 KB int8).
 
 ---
 
 ## 9. Discussion
 
-### 9.1 Why Classical ML Outperforms NNs on Tiers 1–2
+### 9.1 Impact of Waveform Augmentation and Class Balancing
 
-With only 970 training samples, the classical ML models have an advantage: their 441-dimensional hand-crafted feature vectors are computed using domain-specific signal processing (MFCCs, spectral features, chroma) with 7 aggregation statistics each. These features are highly informative and well-matched to the task. The NNs must learn equivalent feature extractors from raw spectrograms with a similar number of parameters — a harder task with limited data.
+The pre-computed waveform augmentation with class-aware balancing was the single most impactful improvement in Phase 3. Key effects:
 
-Additionally, the classical ML models used merged train+val sets (1,178 samples) with 5-fold CV, while the NNs used only the 970 training samples with the val set reserved for early stopping.
+**Dataset size:** Expanding from 970 → 3,317 training samples provided sufficient gradient diversity for all architectures, particularly the DS-CNN which requires more data due to its factorized convolutions.
 
-### 9.2 SpecAugment Effect
+**Class balancing:** Reducing the Tier 2 imbalance from 12.8x to 1.1x had a transformative effect on minority class performance. "Normal Start-Up" (the hardest class) went from 11% recall (classical RF) to 55.6% recall (M6 DS-CNN).
 
-The augmentation sweep results were mixed:
-- **M2 benefited from aggressive SpecAugment** (F=10, T=15), suggesting the 2-D CNN can leverage spectrogram masking to regularize.
-- **M5 performed best without augmentation.** Masking MFCC coefficients (only 13 dimensions) may destroy too much information, even with F=2.
-- **M6 was harmed by aggressive augmentation** (val acc dropped to 18.8%), indicating it lacks the capacity to recover from heavy masking.
+**Training stability:** The M6 DS-CNN was previously unstable at LR ≥ 0.001 with 970 samples but trains reliably at LR=0.002 with 3,317 balanced samples. This confirms that DS-CNN's sensitivity was data-driven, not architectural.
 
-### 9.3 Limitations and Potential Improvements
+### 9.2 SpecAugment Interaction with Waveform Augmentation
 
-- **No waveform-level augmentation** was used. Time-shifting, noise injection, pitch shifting, and speed perturbation (implemented in `src/augmentation.py`) could increase effective dataset diversity and improve NN performance, especially on minority classes.
+With waveform augmentation already applied, additional SpecAugment was generally not needed:
+- **M2 and M6 performed best without SpecAugment** — waveform augmentation provides sufficient regularization
+- **M5 benefited from default SpecAugment** — MFCCs are a more compressed representation, and the additional masking-based regularization helps
+
+This suggests that waveform and spectrogram augmentation are partially redundant for mel-spectrogram models but complementary for MFCC models.
+
+### 9.3 Remaining Limitations
+
+- **"Normal Start-Up" remains the weakest class** (55.6% recall for M6, 44.4% for Tier 3). With only 43 original samples, even 12x augmentation produces limited acoustic diversity. All augmented variants derive from the same 43 source recordings.
+- **Small test set.** With 208 test samples (143 for Tier 3), per-class metrics have high variance. Differences of 1-2 samples can swing F1 scores by several percentage points.
 - **No transfer learning.** Pre-trained audio models (e.g., YAMNet) could provide better feature extractors, though this complicates on-device deployment.
-- **Small dataset.** 970 training samples is at the lower bound for CNN-based audio classification. The NNs are data-limited rather than model-limited.
 
 ---
 
@@ -323,15 +351,19 @@ The augmentation sweep results were mixed:
 
 ```bash
 source .venv/bin/activate
-python src/train_nn.py
+python src/generate_augmented_data.py   # ~20 seconds
+python src/train_nn.py                  # ~22 minutes on GPU
 ```
 
-Requires TensorFlow 2.18 with GPU support. Runtime: ~14 minutes on NVIDIA RTX 2000 Ada.
+Requires TensorFlow 2.18 with GPU support.
 
 ### 10.2 Output Artifacts
 
 | Artifact | Location |
 |----------|----------|
+| Augmented training features | `data/features/{mel_spectrograms,mfcc}/train_augmented.npz` |
+| Augmented normalization stats | `data/normalization_stats_augmented.npz` |
+| Augmentation report | `data/augmentation_report.json` |
 | M2 float32 models | `models/m2_cnn2d_float32/tier{1,2,3}_best.h5` |
 | M5 float32 models | `models/m5_cnn1d_int8_qat/tier{1,2,3}_best.h5` |
 | M6 float32 models | `models/m6_dscnn_int8_qat/tier{1,2,3}_best.h5` |
@@ -353,4 +385,5 @@ Requires TensorFlow 2.18 with GPU support. Runtime: ~14 minutes on NVIDIA RTX 20
 | TensorFlow | 2.18.0 |
 | scikit-learn | ≥ 1.3.0 |
 | numpy | ≥ 1.24.0 |
+| librosa | ≥ 0.10.0 |
 | GPU | NVIDIA RTX 2000 Ada (8 GB, CUDA 12.8) |

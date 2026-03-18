@@ -125,15 +125,25 @@ python src/train_classical.py
 
 To explore the results interactively, open `notebooks/02_classical_ml.ipynb`.
 
-## 8. Train Neural Network Models (Phase 3)
+## 8. Generate Augmented Training Data
 
-This trains three neural network architectures (2-D CNN, 1-D CNN, DS-CNN) on all 3 taxonomy tiers. Includes a hyperparameter search on Tier 2 followed by full training of 9 models.
+This expands the training set from 970 → 3,317 samples using waveform augmentation (time shift, noise, pitch shift, speed perturbation, random gain) with class-aware balancing to mitigate the 12.8x class imbalance.
+
+```bash
+python src/generate_augmented_data.py
+```
+
+Runtime: ~20 seconds. Run this once before training neural networks.
+
+## 9. Train Neural Network Models (Phase 3)
+
+This trains three neural network architectures (2-D CNN, 1-D CNN, DS-CNN) on all 3 taxonomy tiers. Includes a hyperparameter search on Tier 2 followed by full training of 9 models. Automatically uses augmented data if available.
 
 ```bash
 python src/train_nn.py
 ```
 
-Requires TensorFlow 2.18 with GPU support. Runtime: ~14 minutes on GPU, ~2-4 hours on CPU.
+Requires TensorFlow 2.18 with GPU support. Runtime: ~22 minutes on GPU.
 
 **What it produces:**
 
@@ -167,4 +177,5 @@ Later phases (quantization, deployment) will be added to this guide as they are 
 | Verify dataset & splits | `python project_setup/verify_dataset_and_split.py` |
 | Run preprocessing | `python src/run_preprocessing.py` |
 | Train classical ML baselines | `python src/train_classical.py` |
+| Generate augmented data | `python src/generate_augmented_data.py` |
 | Train neural networks | `python src/train_nn.py` |

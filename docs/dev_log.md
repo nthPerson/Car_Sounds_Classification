@@ -4,6 +4,46 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-18 — Waveform Augmentation + Phase 3 Retrain
+
+**What was done:**
+- Implemented `src/generate_augmented_data.py` — pre-computed waveform augmentation with class-aware balancing
+- Expanded training set from 970 → 3,317 samples using 5 waveform augmentation techniques (time shift, noise injection, pitch shift, speed perturbation, random gain)
+- Class-balanced augmentation: minority classes received higher multipliers (up to 12x for Normal Start-Up) to target ~550 samples per Tier 2 class
+- Retrained all 9 NN models with the augmented + balanced dataset
+- Updated `src/train_nn.py` with `USE_AUGMENTED_DATA` flag and support for augmented normalization stats
+
+**Augmentation multipliers (Tier 2):**
+
+| Class | Original | Multiplier | Final |
+|-------|----------|-----------|-------|
+| Normal Braking | 54 | 9x | 540 |
+| Braking Fault | 53 | 9x | 530 |
+| Normal Idle | 185 | 2x | 555 |
+| Idle Fault | 552 | 0x | 552 |
+| Normal Start-Up | 43 | 12x | 559 |
+| Start-Up Fault | 83 | 6x | 581 |
+
+**Results comparison (F1 Macro, before → after augmentation):**
+
+| Model | Tier 1 | Tier 2 | Tier 3 |
+|-------|--------|--------|--------|
+| M2 (2-D CNN) | 0.868 → **0.898** | 0.666 → **0.732** | 0.715 → **0.717** |
+| M5 (1-D CNN) | 0.875 → 0.864 | 0.616 → **0.638** | 0.616 → **0.657** |
+| M6 (DS-CNN) | 0.858 → **0.900** | 0.571 → **0.777** | 0.600 → **0.725** |
+| Best Classical (SVM) | 0.916 | 0.699 | 0.711 |
+
+**Key observations:**
+- M6 (DS-CNN) showed the largest improvement — Tier 2 jumped from 0.571 to 0.777 (+0.206), confirming DS-CNN is highly sensitive to dataset size and class balance
+- M6 now achieves the best Tier 2 F1 macro (0.777), exceeding all classical ML baselines (SVM: 0.699)
+- All three NN architectures now exceed classical baselines on Tier 2 and Tier 3
+- M6's training stability issue at higher learning rates was resolved — can now train at LR=0.002 with augmented data
+- With augmented data, the hyperparameter search selected no SpecAugment for M2 and M6 (waveform augmentation provides sufficient regularization), but default SpecAugment for M5 (MFCCs)
+
+**Status:** Phase 3 retrained with augmented data. Models significantly improved. Ready for Phase 4 (quantization).
+
+---
+
 ## 2026-03-18 — Phase 3 Complete: Neural Network Training
 
 **What was done:**

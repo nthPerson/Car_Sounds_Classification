@@ -1,0 +1,30 @@
+{
+  "original_train_size": 970,
+  "augmented_samples_generated": 2347,
+  "final_train_size": 3317,
+  "target_per_class": 550,
+  "multipliers": {
+    "Normal Braking": 9,
+    "Braking Fault": 9,
+    "Normal Idle": 2,
+    "Idle Fault": 0,
+    "Normal Start-Up": 12,
+    "Start-Up Fault": 6
+  },
+  "final_tier2_distribution": {
+    "Normal Braking": 540,
+    "Braking Fault": 530,
+    "Normal Idle": 555,
+    "Idle Fault": 552,
+    "Normal Start-Up": 559,
+    "Start-Up Fault": 581
+  },
+  "augmentation_techniques": [
+    "time_shift (50% prob, \u00b1100ms)",
+    "add_noise (50% prob, SNR 5-25 dB)",
+    "pitch_shift (30% prob, \u00b12 semitones)",
+    "speed_perturb (30% prob, 0.9-1.1x)",
+    "random_gain (50% prob, 0.7-1.3x)"
+  ],
+  "random_state": 42
+}

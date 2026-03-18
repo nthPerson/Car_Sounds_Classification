@@ -1,27 +1,27 @@
 {
   "m6_tier1": {
-    "accuracy": 0.875,
-    "f1_macro": 0.857983193277311,
-    "f1_weighted": 0.8783088235294118,
-    "best_val_accuracy": 0.9134615659713745,
-    "epochs_trained": 52,
-    "training_time_s": 38.17324709892273,
-    "roc_auc": 0.9400022304003569
+    "accuracy": 0.9134615384615384,
+    "f1_macro": 0.9001280409731114,
+    "f1_weighted": 0.9152159460258051,
+    "best_val_accuracy": 0.9567307829856873,
+    "epochs_trained": 55,
+    "training_time_s": 51.088714838027954,
+    "roc_auc": 0.9733467157354746
   },
   "m6_tier2": {
-    "accuracy": 0.6538461538461539,
-    "f1_macro": 0.5705723154214767,
-    "f1_weighted": 0.6814719243784512,
-    "best_val_accuracy": 0.7067307829856873,
-    "epochs_trained": 93,
-    "training_time_s": 51.49664902687073
+    "accuracy": 0.8701923076923077,
+    "f1_macro": 0.7766742150815077,
+    "f1_weighted": 0.865997405109892,
+    "best_val_accuracy": 0.9038461446762085,
+    "epochs_trained": 41,
+    "training_time_s": 38.702558755874634
   },
   "m6_tier3": {
-    "accuracy": 0.6223776223776224,
-    "f1_macro": 0.5997386845340063,
-    "f1_weighted": 0.6263780522153728,
-    "best_val_accuracy": 0.7183098793029785,
-    "epochs_trained": 100,
-    "training_time_s": 55.047260761260986
+    "accuracy": 0.7762237762237763,
+    "f1_macro": 0.7246838175604056,
+    "f1_weighted": 0.7723433797809061,
+    "best_val_accuracy": 0.8661971688270569,
+    "epochs_trained": 65,
+    "training_time_s": 56.99186038970947
   }
 }

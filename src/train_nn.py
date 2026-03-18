@@ -84,10 +84,17 @@ def _set_seeds(seed: int = RANDOM_STATE) -> None:
 # ─── Data Loading ─────────────────────────────────────────────────────────
 
 
+USE_AUGMENTED_DATA = True  # Set to False to train on original 970 samples only
+
+
 def load_data(
     tier: int, feature_type: str
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Load features, normalize, and filter Tier 3.
+
+    When USE_AUGMENTED_DATA is True and augmented files exist, loads the
+    expanded training set (original + waveform-augmented) with class-
+    balanced augmentation.  Val and test sets are always unaugmented.
 
     Returns:
         (X_train, y_train, X_val, y_val, X_test, y_test)
@@ -98,14 +105,22 @@ def load_data(
         else DATA_DIR / "features" / "mfcc"
     )
 
-    train = np.load(feature_dir / "train.npz")
+    # Check for augmented training data
+    aug_path = feature_dir / "train_augmented.npz"
+    if USE_AUGMENTED_DATA and aug_path.exists():
+        train = np.load(aug_path)
+        stats_path = DATA_DIR / "normalization_stats_augmented.npz"
+    else:
+        train = np.load(feature_dir / "train.npz")
+        stats_path = DATA_DIR / "normalization_stats.npz"
+
     val = np.load(feature_dir / "val.npz")
     test = np.load(feature_dir / "test.npz")
 
     label_key = f"y_tier{tier}"
 
-    # Load normalization stats
-    stats = np.load(DATA_DIR / "normalization_stats.npz")
+    # Load normalization stats (augmented stats if using augmented data)
+    stats = np.load(stats_path)
     mean = stats[f"{feature_type}_mean"]
     std = stats[f"{feature_type}_std"]
 
