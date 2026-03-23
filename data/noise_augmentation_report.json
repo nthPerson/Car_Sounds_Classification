@@ -1,0 +1,83 @@
+{
+  "augmentation_type": "noise_augmented",
+  "description": "Waveform augmentation + real-world noise injection using Arduino-collected noise bank",
+  "original_train_size": 970,
+  "augmented_samples_generated": 2347,
+  "final_train_size": 3317,
+  "target_per_class": 550,
+  "multipliers": {
+    "Normal Braking": 9,
+    "Braking Fault": 9,
+    "Normal Idle": 2,
+    "Idle Fault": 0,
+    "Normal Start-Up": 12,
+    "Start-Up Fault": 6
+  },
+  "final_tier2_distribution": {
+    "Normal Braking": 540,
+    "Braking Fault": 530,
+    "Normal Idle": 555,
+    "Idle Fault": 552,
+    "Normal Start-Up": 559,
+    "Start-Up Fault": 581
+  },
+  "augmentation_techniques": [
+    "time_shift (50% prob, +/-100ms)",
+    "add_noise (50% prob, SNR 5-25 dB, Gaussian)",
+    "pitch_shift (30% prob, +/-2 semitones)",
+    "speed_perturb (30% prob, 0.9-1.1x)",
+    "random_gain (50% prob, 0.7-1.3x)",
+    "real_world_noise_injection (100% prob, SNR from [5, 10, 15, 20] dB)"
+  ],
+  "noise_bank": {
+    "total_noise_samples": 360,
+    "noise_groups": [
+      "engine_mechanical",
+      "hvac",
+      "road_driving",
+      "cabin_driving",
+      "wind",
+      "ambient_stationary"
+    ],
+    "group_counts": {
+      "engine_mechanical": 103,
+      "hvac": 30,
+      "road_driving": 60,
+      "cabin_driving": 60,
+      "wind": 20,
+      "ambient_stationary": 87
+    },
+    "operational_state_mapping": {
+      "braking": [
+        "engine_mechanical",
+        "road_driving",
+        "cabin_driving",
+        "wind",
+        "hvac"
+      ],
+      "idle": [
+        "engine_mechanical",
+        "hvac",
+        "ambient_stationary",
+        "wind"
+      ],
+      "startup": [
+        "ambient_stationary",
+        "wind",
+        "hvac"
+      ]
+    },
+    "snr_levels_db": [
+      5,
+      10,
+      15,
+      20
+    ]
+  },
+  "output_files": [
+    "data/features/mel_spectrograms/train_noise_augmented.npz",
+    "data/features/mfcc/train_noise_augmented.npz",
+    "data/normalization_stats_noise_augmented.npz"
+  ],
+  "random_state": 42
+}
