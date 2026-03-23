@@ -1,0 +1,75 @@
+{
+  "noise_groups": {
+    "engine_mechanical": [
+      "ambient_under_hood",
+      "cold_engine_just_started_under_hood",
+      "warm_engine_idle_under_hood",
+      "varying_rpm_1500-2500_under_hood",
+      "engine_fan_on_under_hood"
+    ],
+    "hvac": [
+      "fan_speed_1_idle_under_hood",
+      "fan_speed_medium_idle_under_hood",
+      "fan_speed_max_idle_under_hood"
+    ],
+    "road_driving": [
+      "low_speed_residential_under_hood",
+      "moderate_speed_city_under_hood",
+      "rough_road_under_hood"
+    ],
+    "cabin_driving": [
+      "interior_cabin_city_streets_windows_up",
+      "interior_cabin_city_windows_down",
+      "interior_cabin_highway_speeds_windows_up",
+      "interior_cabin_highway_speeds_windows_down"
+    ],
+    "wind": [
+      "windy_day_ambient",
+      "windy_driving_city_streets"
+    ],
+    "ambient_stationary": [
+      "parking_lot_windows_up_ambient",
+      "parking_lot_windows_down_ambient",
+      "quiet_residential_ambient",
+      "stoplight_ambient_windows_down",
+      "busy_street_ambient",
+      "busy_highway_ambient"
+    ]
+  },
+  "noise_relevance": {
+    "braking": [
+      "engine_mechanical",
+      "road_driving",
+      "cabin_driving",
+      "wind",
+      "hvac"
+    ],
+    "idle": [
+      "engine_mechanical",
+      "hvac",
+      "ambient_stationary",
+      "wind"
+    ],
+    "startup": [
+      "ambient_stationary",
+      "wind",
+      "hvac"
+    ]
+  },
+  "total_samples": 360,
+  "group_sample_counts": {
+    "engine_mechanical": 103,
+    "hvac": 30,
+    "road_driving": 60,
+    "cabin_driving": 60,
+    "wind": 20,
+    "ambient_stationary": 87
+  },
+  "snr_levels_db": [
+    5,
+    10,
+    15,
+    20
+  ],
+  "noise_bank_path": "data/noise_bank/noise_bank.npz"
+}

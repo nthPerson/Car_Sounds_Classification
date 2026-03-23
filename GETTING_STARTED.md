@@ -158,6 +158,31 @@ Requires TensorFlow 2.18 with GPU support. Runtime: ~22 minutes on GPU.
 
 To explore the results interactively, open `notebooks/03_neural_networks.ipynb`.
 
+## 10. Collect Background Noise Samples (Optional)
+
+Collect real-world background noise using the Arduino's microphone for more realistic data augmentation. Requires the Arduino Nano 33 BLE Sense Rev2 connected via USB.
+
+**Step 1:** Upload the sketch `arduino/noise_collector/noise_collector.ino` to the Arduino using the Arduino IDE.
+
+**Step 2:** Run the PC-side receiver script:
+
+```bash
+pip install pyserial    # if not already installed
+python src/collect_noise.py --port /dev/ttyACM0 --output data/noise_samples/
+# On Windows, use: --port COM3 (check Device Manager for the correct port)
+```
+
+**Step 3:** In the terminal, type commands to control the Arduino:
+
+```
+label idle_parking_lot    # Set the label
+record 10                 # Record 10 consecutive 1.5s clips
+label road_highway        # Change label
+record 20                 # Record more clips
+```
+
+WAV files are saved automatically to `data/noise_samples/{label}/`.
+
 ## What's Next
 
 Later phases (quantization, deployment) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
