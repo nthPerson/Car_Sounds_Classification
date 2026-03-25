@@ -84,7 +84,8 @@ def _set_seeds(seed: int = RANDOM_STATE) -> None:
 # ─── Data Loading ─────────────────────────────────────────────────────────
 
 
-USE_AUGMENTED_DATA = True  # Set to False to train on original 970 samples only
+AUGMENTATION_VARIANT = "combined"  # Options: "none", "standard", "noise", "combined"
+SKIP_HP_SEARCH = True           # Reuse existing hyperparameter search results
 
 
 def load_data(
@@ -92,9 +93,13 @@ def load_data(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Load features, normalize, and filter Tier 3.
 
-    When USE_AUGMENTED_DATA is True and augmented files exist, loads the
-    expanded training set (original + waveform-augmented) with class-
-    balanced augmentation.  Val and test sets are always unaugmented.
+    Uses AUGMENTATION_VARIANT to select training data:
+        "none"     — original 970 samples
+        "standard" — waveform-augmented, class-balanced (3,317 samples)
+        "noise"    — waveform-augmented + real-world noise injection (3,317)
+        "combined" — standard + noise augmented copies together (5,664)
+
+    Val and test sets are always unaugmented.
 
     Returns:
         (X_train, y_train, X_val, y_val, X_test, y_test)
@@ -105,14 +110,27 @@ def load_data(
         else DATA_DIR / "features" / "mfcc"
     )
 
-    # Check for augmented training data
-    aug_path = feature_dir / "train_augmented.npz"
-    if USE_AUGMENTED_DATA and aug_path.exists():
-        train = np.load(aug_path)
+    # Select training data and normalization stats based on augmentation variant
+    if AUGMENTATION_VARIANT == "combined":
+        train_file = feature_dir / "train_combined.npz"
+        stats_path = DATA_DIR / "normalization_stats_combined.npz"
+    elif AUGMENTATION_VARIANT == "noise":
+        train_file = feature_dir / "train_noise_augmented.npz"
+        stats_path = DATA_DIR / "normalization_stats_noise_augmented.npz"
+    elif AUGMENTATION_VARIANT == "standard":
+        train_file = feature_dir / "train_augmented.npz"
         stats_path = DATA_DIR / "normalization_stats_augmented.npz"
-    else:
-        train = np.load(feature_dir / "train.npz")
+    else:  # "none"
+        train_file = feature_dir / "train.npz"
         stats_path = DATA_DIR / "normalization_stats.npz"
+
+    if not train_file.exists():
+        raise FileNotFoundError(
+            f"Training data not found: {train_file}\n"
+            f"  AUGMENTATION_VARIANT={AUGMENTATION_VARIANT!r}\n"
+            f"  Run the appropriate augmentation script first."
+        )
+    train = np.load(train_file)
 
     val = np.load(feature_dir / "val.npz")
     test = np.load(feature_dir / "test.npz")
@@ -541,16 +559,27 @@ def main() -> None:
     print("=" * 60)
     print("  Phase 3: Neural Network Training")
     print("=" * 60)
+    print(f"\n  Augmentation variant: {AUGMENTATION_VARIANT}")
+    print(f"  Skip HP search: {SKIP_HP_SEARCH}")
 
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
     # ── Step 1: Hyperparameter search on Tier 2 ─────────────────────────
-    search_results = run_hyperparameter_search()
-
-    # Save search results
-    with open(MODELS_DIR / "hyperparameter_search.json", "w") as f:
-        json.dump(search_results, f, indent=2, cls=_NumpyEncoder)
-    print(f"\n  Saved: models/hyperparameter_search.json")
+    hp_path = MODELS_DIR / "hyperparameter_search.json"
+    if SKIP_HP_SEARCH and hp_path.exists():
+        print("\n  Skipping hyperparameter search — loading existing results...")
+        with open(hp_path) as f:
+            search_results = json.load(f)
+        for model_name in MODEL_NAMES:
+            sr = search_results[model_name]
+            cfg = get_model_config(model_name)
+            print(f"    {cfg['display_name']}: LR={sr['best_lr']}, "
+                  f"Dropout={sr['best_dropout']}, Aug={sr['best_augmentation']}")
+    else:
+        search_results = run_hyperparameter_search()
+        with open(hp_path, "w") as f:
+            json.dump(search_results, f, indent=2, cls=_NumpyEncoder)
+        print(f"\n  Saved: models/hyperparameter_search.json")
 
     # ── Step 2: Train all 9 models with best hyperparameters ─────────────
     print("\n" + "=" * 60)
