@@ -137,13 +137,21 @@ Runtime: ~20 seconds. Run this once before training neural networks.
 
 ## 9. Train Neural Network Models (Phase 3)
 
-This trains three neural network architectures (2-D CNN, 1-D CNN, DS-CNN) on all 3 taxonomy tiers. Includes a hyperparameter search on Tier 2 followed by full training of 9 models. Automatically uses augmented data if available.
+This trains three neural network architectures (2-D CNN, 1-D CNN, DS-CNN) on all 3 taxonomy tiers. By default, trains on noise-augmented data and reuses existing hyperparameter search results.
 
 ```bash
 python src/train_nn.py
 ```
 
-Requires TensorFlow 2.18 with GPU support. Runtime: ~22 minutes on GPU.
+Requires TensorFlow 2.18 with GPU support. Runtime: ~6 minutes on GPU (no HP search), ~22 minutes with HP search.
+
+**Training data variant:** Edit `AUGMENTATION_VARIANT` at the top of `src/train_nn.py`:
+- `"combined"` — All augmented data together (5,664 samples, default)
+- `"noise"` — Real-world noise augmentation only (3,317 samples)
+- `"standard"` — Synthetic waveform augmentation only (3,317 samples)
+- `"none"` — Original data, no augmentation (970 samples)
+
+Set `SKIP_HP_SEARCH = False` to re-run the hyperparameter search (adds ~15 min).
 
 **What it produces:**
 

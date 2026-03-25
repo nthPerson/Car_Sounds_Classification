@@ -4,6 +4,88 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-22 — Real-World Noise Data Collection + Noise-Augmented Training (Condition C)
+
+**What was done:**
+- Created Arduino sketch (`arduino/noise_collector/noise_collector.ino`) and PC receiver script (`src/collect_noise.py`) for data collection
+- Collected 360 real-world background noise samples using the Arduino Nano 33 BLE Sense Rev2 PDM microphone in/around a 2008 VW Jetta (23 categories: engine idle, road noise, HVAC, wind, ambient, cabin driving)
+- Built noise analysis notebook (`notebooks/04_noise_analysis.ipynb`) — validated quality, grouped into 6 noise categories with operational-state-aware mapping
+- Built noise augmentation notebook (`notebooks/05_noise_augmentation.ipynb`) — generated `train_noise_augmented.npz` (3,317 samples with real-world noise at SNR 5-20 dB)
+- Modified `src/train_nn.py` — replaced `USE_AUGMENTED_DATA` flag with `AUGMENTATION_VARIANT` ("none"/"standard"/"noise") and added `SKIP_HP_SEARCH` to reuse existing hyperparameter configs
+- Trained all 9 NN models on noise-augmented data (Condition C), reusing Condition B hyperparameters
+- Archived Condition B results for ablation comparison
+
+**Three-condition ablation results (F1 Macro):**
+
+| Model | Tier | Cond. A (Original) | Cond. B (Synthetic) | Cond. C (Noise) | B→C Δ |
+|-------|------|-------------------|--------------------|--------------------|-------|
+| M2 (2-D CNN) | 1 | 0.868 | 0.898 | 0.861 | −0.037 |
+| M2 (2-D CNN) | 2 | 0.666 | 0.732 | **0.734** | +0.002 |
+| M2 (2-D CNN) | 3 | 0.715 | 0.717 | **0.722** | +0.005 |
+| M5 (1-D CNN) | 1 | 0.875 | 0.864 | 0.874 | +0.010 |
+| M5 (1-D CNN) | 2 | 0.616 | 0.638 | 0.596 | −0.042 |
+| M5 (1-D CNN) | 3 | 0.616 | 0.657 | 0.612 | −0.045 |
+| M6 (DS-CNN) | 1 | 0.858 | 0.900 | 0.890 | −0.010 |
+| M6 (DS-CNN) | 2 | 0.571 | 0.777 | 0.739 | −0.038 |
+| M6 (DS-CNN) | 3 | 0.600 | 0.725 | **0.762** | +0.037 |
+
+**Key observations:**
+- B→C deltas are small (±0.01-0.05) on the clean test set, which is expected — noise injection improves robustness to deployment-time noise, not clean-test accuracy
+- M6 Tier 3 shows the clearest improvement (+0.037), suggesting noise augmentation helps the most complex classification task
+- M5 (1-D CNN on MFCCs) shows consistent degradation with noise injection — MFCCs may already discard the frequency bands where real-world noise provides useful regularization
+- Condition C models are the production models for Phase 4 quantization, chosen for expected on-device robustness over marginal clean-test-set differences
+
+**Documentation created:**
+- `docs/noise_data_collection_and_augmentation.md` — complete documentation of noise collection methodology, hardware, protocol, augmentation approach, and limitations
+
+**Status:** Phase 3 retrained with noise-augmented data (Condition C). Continued with Condition D (combined).
+
+---
+
+## 2026-03-22 — Combined Augmentation Training (Condition D)
+
+**What was done:**
+- Generated combined training features (`train_combined.npz`): 5,664 samples = all of Condition B (970 originals + 2,347 synthetic) + 2,347 noise-augmented copies from Condition C
+- Added `"combined"` option to `AUGMENTATION_VARIANT` in `src/train_nn.py`
+- Trained all 9 NN models on combined data, reusing Condition B hyperparameters
+- Updated ablation study to 4 conditions (A, B, C, D)
+
+**Combined dataset class distribution (Tier 2):**
+
+| Class | Count | % |
+|-------|-------|---|
+| Normal Braking | 1,026 | 18.1% |
+| Braking Fault | 1,007 | 17.8% |
+| Normal Idle | 925 | 16.3% |
+| Idle Fault | 552 | 9.7% |
+| Normal Start-Up | 1,075 | 19.0% |
+| Start-Up Fault | 1,079 | 19.1% |
+
+Note: class imbalance is inverted — Idle Fault (no augmentation) is now the smallest class. `compute_class_weight('balanced')` compensates during training.
+
+**Key results (F1 Macro, Condition D vs best prior):**
+
+| Model | Tier 1 | Tier 2 | Tier 3 |
+|-------|--------|--------|--------|
+| M2 (2-D CNN) | 0.898 (=B) | **0.751** (best, +0.019 vs B) | **0.764** (best, +0.047 vs B) |
+| M5 (1-D CNN) | 0.858 (B better) | 0.625 (B better) | 0.651 (B better) |
+| M6 (DS-CNN) | **0.909** (best) | 0.742 (B better) | 0.686 (C better) |
+
+**Key observations:**
+- M2 is the clear winner from Condition D — achieves its best scores on Tiers 2 (+0.019) and 3 (+0.047), suggesting the 2-D CNN architecture benefits most from data volume
+- M6 achieves its best Tier 1 score (0.909) but doesn't improve on Tiers 2/3, possibly due to the inverted class imbalance
+- M5 (MFCC-based) does not benefit from combined data — Condition B remains best
+- No single condition is universally best; the optimal choice depends on architecture and tier
+
+**Phase 4 quantization candidates (Tier 2):**
+1. M6 + Condition B (F1=0.777) — best Tier 2 overall
+2. M2 + Condition D (F1=0.751) — best M2 score
+3. M6 + Condition D (F1=0.742)
+
+**Status:** All 4 ablation conditions complete (A, B, C, D). Ready to select best model+condition for Phase 4 (quantization).
+
+---
+
 ## 2026-03-18 — Waveform Augmentation + Phase 3 Retrain
 
 **What was done:**

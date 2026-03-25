@@ -1,7 +1,7 @@
 # Neural Network Models — Model Documentation
 
 **Phase:** 3 (Neural Network Training)
-**Date:** March 18, 2026
+**Date:** March 22, 2026 (updated with noise-augmented results)
 **Related code:** `src/models.py`, `src/train_nn.py`, `src/evaluate.py`, `notebooks/03_neural_networks.ipynb`
 
 ---
@@ -53,7 +53,7 @@ Each architecture was trained on all 3 tiers: Tier 1 (2-class), Tier 2 (6-class)
 | Output shape | (92, 13) |
 | Normalization | Per-coefficient z-score (train-set statistics) |
 
-Features were pre-computed in Phase 1 and stored un-normalized. Z-score normalization was applied at training time using statistics from `data/normalization_stats.npz` (computed from the training set only).
+Features were pre-computed in Phase 1 and stored un-normalized. Z-score normalization was applied at training time using statistics computed from the training set only (`data/normalization_stats_noise_augmented.npz` for the final noise-augmented training condition).
 
 ---
 
@@ -193,7 +193,11 @@ Training data was expanded from 970 → 3,317 samples using `src/generate_augmen
 
 This reduces the Tier 2 imbalance ratio from 12.8x (552:43) to 1.1x (581:530).
 
-**Level 2 — On-the-fly SpecAugment (optional per architecture):**
+**Level 2 — Real-world noise injection (100% of augmented samples):**
+
+Each augmented sample receives noise from a bank of 360 real-world recordings collected with the Arduino Nano 33 BLE Sense Rev2's PDM microphone in and around a 2008 Volkswagen Jetta. Noise is mixed at a random SNR from {5, 10, 15, 20} dB, with operational-state-aware noise group selection (e.g., braking samples receive road/driving noise, idle samples receive engine/HVAC noise). See `docs/noise_data_collection_and_augmentation.md` for full details.
+
+**Level 3 — On-the-fly SpecAugment (optional per architecture):**
 
 Applied during training with 50% probability per sample per epoch. Only used for M5 (1-D CNN on MFCCs) based on hyperparameter search results; M2 and M6 performed best without SpecAugment when waveform augmentation was already applied.
 
@@ -242,56 +246,58 @@ A structured manual search was conducted on Tier 2 (primary target) for all thre
 
 ## 7. Results
 
-### 7.1 Summary Table
+### 7.1 Summary Table (Condition C — Noise-Augmented)
 
-| Model | Tier | Accuracy | F1 Macro | F1 Weighted | Epochs | Time (s) |
-|-------|------|----------|----------|-------------|--------|----------|
-| M2 (2-D CNN) | 1 | 0.9135 | 0.8975 | 0.9142 | 51 | 33.2 |
-| M2 (2-D CNN) | 2 | 0.8654 | 0.7315 | 0.8590 | 75 | 45.3 |
-| M2 (2-D CNN) | 3 | 0.7692 | 0.7165 | 0.7733 | 61 | 36.1 |
-| M5 (1-D CNN) | 1 | 0.8798 | 0.8640 | 0.8832 | 55 | 32.4 |
-| M5 (1-D CNN) | 2 | 0.8029 | 0.6377 | 0.8100 | 65 | 36.5 |
-| M5 (1-D CNN) | 3 | 0.7273 | 0.6570 | 0.7254 | 81 | 42.0 |
-| M6 (DS-CNN) | 1 | 0.9135 | 0.9001 | 0.9152 | 55 | 51.1 |
-| M6 (DS-CNN) | 2 | 0.8702 | 0.7767 | 0.8660 | 41 | 38.7 |
-| M6 (DS-CNN) | 3 | 0.7762 | 0.7247 | 0.7723 | 65 | 57.0 |
+| Model | Tier | Accuracy | F1 Macro | F1 Weighted | Epochs |
+|-------|------|----------|----------|-------------|--------|
+| M2 (2-D CNN) | 1 | 0.8798 | 0.8607 | 0.8820 | 41 |
+| M2 (2-D CNN) | 2 | 0.8606 | 0.7335 | 0.8582 | 57 |
+| M2 (2-D CNN) | 3 | 0.7762 | 0.7217 | 0.7740 | 66 |
+| M5 (1-D CNN) | 1 | 0.8942 | 0.8736 | 0.8947 | 50 |
+| M5 (1-D CNN) | 2 | 0.7933 | 0.5956 | 0.7944 | 65 |
+| M5 (1-D CNN) | 3 | 0.6923 | 0.6116 | 0.6909 | 72 |
+| M6 (DS-CNN) | 1 | 0.9087 | 0.8903 | 0.9089 | 49 |
+| M6 (DS-CNN) | 2 | 0.8413 | 0.7388 | 0.8403 | 25 |
+| M6 (DS-CNN) | 3 | 0.8182 | 0.7624 | 0.8147 | 62 |
 
 ### 7.2 Comparison with Classical ML Baselines
 
 | Tier | Best Classical ML | Best NN | NN Beats Baseline? |
 |------|------------------|---------|--------------------|
-| 1 | SVM (F1=0.916) | M6 (F1=0.900) | No (−0.016) |
-| 2 | SVM (F1=0.699) | **M6 (F1=0.777)** | **Yes (+0.078)** |
-| 3 | SVM (F1=0.711) | **M6 (F1=0.725)** | **Yes (+0.014)** |
+| 1 | SVM (F1=0.916) | M6 (F1=0.890) | No (−0.026) |
+| 2 | SVM (F1=0.699) | **M6 (F1=0.739)** | **Yes (+0.040)** |
+| 3 | SVM (F1=0.711) | **M6 (F1=0.762)** | **Yes (+0.051)** |
 
-With augmented + class-balanced training data, all three NN architectures now exceed the classical ML baselines on Tiers 2 and 3. On Tier 1 (binary), the gap narrowed significantly (−0.016 vs −0.041 before augmentation). The M6 DS-CNN, which performed worst before augmentation, became the best architecture after receiving sufficient training data.
+With noise-augmented + class-balanced training data, the NN architectures exceed classical ML baselines on Tiers 2 and 3. On Tier 1 (binary), the SVM baseline remains stronger. The M6 DS-CNN continues to be the best architecture on Tiers 2 and 3, with a particularly strong showing on Tier 3 (+0.051 over SVM).
 
 ### 7.3 Per-Class Results — Tier 2 (M6 DS-CNN, best NN)
 
 | Class | Support | Precision | Recall | F1 |
 |-------|---------|-----------|--------|-----|
-| Normal Braking | 12 | 0.7500 | 1.0000 | 0.8571 |
-| Braking Fault | 11 | 0.7273 | 0.7273 | 0.7273 |
+| Normal Braking | 12 | 0.5882 | 0.8333 | 0.6897 |
+| Braking Fault | 11 | 1.0000 | 0.6364 | 0.7778 |
 | Normal Idle | 40 | 0.8611 | 0.7750 | 0.8158 |
-| Idle Fault | 118 | 0.9120 | 0.9661 | 0.9383 |
-| Normal Start-Up | 9 | 0.6250 | 0.5556 | 0.5882 |
-| Start-Up Fault | 18 | 0.9167 | 0.6111 | 0.7333 |
+| Idle Fault | 118 | 0.8880 | 0.9407 | 0.9136 |
+| Normal Start-Up | 9 | 0.5000 | 0.5556 | 0.5263 |
+| Start-Up Fault | 18 | 0.8462 | 0.6111 | 0.7097 |
 
-**"Normal Start-Up" recall improved dramatically** — from 11-22% (classical ML) and 22-56% (NNs without augmentation) to 55.6% (M6 with augmentation). The class-balanced augmentation (12x expansion for this class) was the primary driver.
+**"Normal Start-Up" recall remains improved** over classical baselines (55.6% vs 11-22%) due to class-balanced augmentation (12x expansion). Braking Fault achieves perfect precision (1.0) with the noise-augmented training data.
 
 ### 7.4 Per-Class Results — Tier 3 (M6 DS-CNN)
 
 | Class | Support | Precision | Recall | F1 |
 |-------|---------|-----------|--------|-----|
-| Normal Braking | 12 | 0.7059 | 1.0000 | 0.8276 |
-| Worn Brakes | 11 | 0.8889 | 0.7273 | 0.8000 |
-| Normal Idle | 40 | 0.8889 | 0.8000 | 0.8421 |
-| Low Oil | 16 | 0.7500 | 0.7500 | 0.7500 |
-| Power Steering Fault | 19 | 0.7619 | 0.8421 | 0.8000 |
-| Serpentine Belt Fault | 18 | 0.8571 | 1.0000 | 0.9231 |
-| Normal Start-Up | 9 | 0.4000 | 0.4444 | 0.4211 |
-| Bad Ignition | 9 | 0.6667 | 0.4444 | 0.5333 |
-| Dead Battery | 9 | 0.7143 | 0.5556 | 0.6250 |
+| Normal Braking | 12 | 0.9231 | 1.0000 | 0.9600 |
+| Worn Brakes | 11 | 0.8182 | 0.8182 | 0.8182 |
+| Normal Idle | 40 | 0.8974 | 0.8750 | 0.8861 |
+| Low Oil | 16 | 0.7222 | 0.8125 | 0.7647 |
+| Power Steering Fault | 19 | 0.8889 | 0.8421 | 0.8649 |
+| Serpentine Belt Fault | 18 | 0.9474 | 1.0000 | 0.9730 |
+| Normal Start-Up | 9 | 0.4286 | 0.3333 | 0.3750 |
+| Bad Ignition | 9 | 0.6250 | 0.5556 | 0.5882 |
+| Dead Battery | 9 | 0.6000 | 0.6667 | 0.6316 |
+
+Tier 3 performance improved significantly with noise augmentation, with Normal Braking reaching 96.0% F1 and Serpentine Belt Fault reaching 97.3% F1. "Normal Start-Up" remains the weakest class (F1=0.375) due to limited source recordings (43 original samples).
 
 ---
 
@@ -301,7 +307,7 @@ With augmented + class-balanced training data, all three NN architectures now ex
 
 | Aspect | M2 (2-D CNN) | M5 (1-D CNN) | M6 (DS-CNN) |
 |--------|-------------|-------------|-------------|
-| Best F1 macro (Tier 2) | 0.732 | 0.638 | **0.777** |
+| Best F1 macro (Tier 2) | 0.734 | 0.596 | **0.739** |
 | Parameters (Tier 2) | 14,566 | **6,246** | 8,166 |
 | Float32 model size | 237 KB | **140 KB** | 246 KB |
 | Est. int8 model size | ~16 KB | **~8 KB** | ~9 KB |
@@ -311,15 +317,77 @@ With augmented + class-balanced training data, all three NN architectures now ex
 
 ### 8.2 Deployment Recommendations
 
-1. **M6 (DS-CNN) — Best accuracy candidate.** Highest F1 macro on Tier 2 (0.777) and competitive on all tiers. Tensor arena (~35-45 KB) fits comfortably within the 80 KB budget. Int8 model size (~9 KB) is well within flash budget.
-2. **M2 (2-D CNN) — Strong alternative.** Second-best accuracy. Tensor arena (~75 KB) is tight but within budget. More parameters = more room for quantization to degrade accuracy.
+1. **M6 (DS-CNN) — Best accuracy candidate.** Highest F1 macro on Tiers 2 (0.739) and 3 (0.762). Tensor arena (~35-45 KB) fits comfortably within the 80 KB budget. Int8 model size (~9 KB) is well within flash budget.
+2. **M2 (2-D CNN) — Strong alternative.** Competitive accuracy (Tier 2 F1=0.734). Tensor arena (~75 KB) is tight but within budget. More parameters = more room for quantization to degrade accuracy.
 3. **M5 (1-D CNN) — Smallest footprint.** Safest deployment if SRAM is constrained (~20 KB arena). Lower accuracy but the most compact model (~8 KB int8).
 
 ---
 
-## 9. Discussion
+## 9. Augmentation Ablation Study
 
-### 9.1 Impact of Waveform Augmentation and Class Balancing
+Four training conditions were compared to measure the impact of augmentation strategy on model performance. All conditions use the same model architectures, hyperparameters, validation set, and test set.
+
+| Condition | Description | Train Size |
+|-----------|-------------|-----------|
+| A (Original) | No augmentation, class-imbalanced | 970 |
+| B (Synthetic) | Waveform augmentation + class balancing | 3,317 |
+| C (Noise) | Waveform aug + class balancing + real-world noise injection | 3,317 |
+| D (Combined) | B + C augmented copies together (originals + synthetic + noise) | 5,664 |
+
+Note: Condition D combines all of Condition B (970 originals + 2,347 synthetic copies) with the 2,347 noise-augmented copies from Condition C. The originals appear once; the augmented copies appear in both their synthetic and noise-injected forms. This inverts the original class imbalance — Idle Fault (552 samples, no augmentation) becomes the smallest class while augmented classes have ~1,000+ samples. The `compute_class_weight('balanced')` setting in training compensates for this.
+
+### 9.1 F1 Macro Comparison (Primary Metric)
+
+| Model | Tier | Cond. A | Cond. B | Cond. C | Cond. D | Best |
+|-------|------|---------|---------|---------|---------|------|
+| M2 (2-D CNN) | 1 | 0.868 | **0.898** | 0.861 | **0.898** | B/D |
+| M2 (2-D CNN) | 2 | 0.666 | 0.732 | 0.734 | **0.751** | **D** |
+| M2 (2-D CNN) | 3 | 0.715 | 0.717 | 0.722 | **0.764** | **D** |
+| M5 (1-D CNN) | 1 | **0.875** | 0.864 | 0.874 | 0.858 | A |
+| M5 (1-D CNN) | 2 | 0.616 | **0.638** | 0.596 | 0.625 | B |
+| M5 (1-D CNN) | 3 | 0.616 | **0.657** | 0.612 | 0.651 | B |
+| M6 (DS-CNN) | 1 | 0.858 | 0.900 | 0.890 | **0.909** | **D** |
+| M6 (DS-CNN) | 2 | 0.571 | **0.777** | 0.739 | 0.742 | B |
+| M6 (DS-CNN) | 3 | 0.600 | 0.725 | **0.762** | 0.686 | C |
+
+### 9.2 Ablation Observations
+
+**A→B (effect of synthetic augmentation + class balancing):**
+- Universally beneficial, especially for M6 DS-CNN (+0.206 on Tier 2), confirming that DS-CNN is highly sensitive to dataset size and class balance
+- The single most impactful improvement across the entire project
+
+**B→C (isolated effect of real-world noise injection):**
+- Mixed results on the clean test set: some model-tier combinations improve slightly (M2 Tier 2/3, M6 Tier 3), others decline slightly (M6 Tier 2, M5 Tier 2/3)
+- The deltas are small (±0.01–0.05), consistent with the expectation that noise injection primarily improves robustness to deployment-time noise rather than performance on clean test data
+
+**D (combined — effect of maximum data volume):**
+- M2 (2-D CNN) benefits the most from combined data: best scores on Tiers 2 and 3 (0.751 and 0.764), suggesting the 2-D CNN architecture can effectively leverage the additional 5,664 training samples
+- M6 (DS-CNN) achieves its best Tier 1 score (0.909) with combined data, but Tier 2 and 3 performance doesn't improve over Condition B — the inverted class imbalance may hurt DS-CNN despite class weighting
+- M5 (1-D CNN) does not benefit from combined data — Condition B remains best across all tiers, suggesting MFCCs don't gain from noise-diversity augmentation
+
+**Best condition per architecture (Tier 2, primary target):**
+- M2: Condition D (F1=0.751) — benefits from data volume
+- M5: Condition B (F1=0.638) — noise augmentation hurts MFCC-based models
+- M6: Condition B (F1=0.777) — already saturated at 3,317 samples for this architecture
+
+### 9.3 Selection for Phase 4 (Quantization)
+
+For Phase 4, we should select the best-performing model+condition combination per architecture to quantize and deploy. The top candidates for Tier 2 (primary deployment target):
+
+| Rank | Model + Condition | Tier 2 F1 Macro | Notes |
+|------|------------------|----------------|-------|
+| 1 | M6 (DS-CNN) + Cond. B | **0.777** | Best overall Tier 2 score |
+| 2 | M2 (2-D CNN) + Cond. D | **0.751** | Best M2 score; benefits from combined data |
+| 3 | M6 (DS-CNN) + Cond. D | 0.742 | Slight degradation from inverted imbalance |
+| 4 | M6 (DS-CNN) + Cond. C | 0.739 | Noise robustness for on-device use |
+
+The final choice depends on the Phase 4 quantization results — the best float32 model may not remain the best after int8 quantization.
+
+---
+
+## 10. Discussion
+
+### 10.1 Impact of Waveform Augmentation and Class Balancing
 
 The pre-computed waveform augmentation with class-aware balancing was the single most impactful improvement in Phase 3. Key effects:
 
@@ -329,7 +397,7 @@ The pre-computed waveform augmentation with class-aware balancing was the single
 
 **Training stability:** The M6 DS-CNN was previously unstable at LR ≥ 0.001 with 970 samples but trains reliably at LR=0.002 with 3,317 balanced samples. This confirms that DS-CNN's sensitivity was data-driven, not architectural.
 
-### 9.2 SpecAugment Interaction with Waveform Augmentation
+### 10.2 SpecAugment Interaction with Waveform Augmentation
 
 With waveform augmentation already applied, additional SpecAugment was generally not needed:
 - **M2 and M6 performed best without SpecAugment** — waveform augmentation provides sufficient regularization
@@ -337,7 +405,7 @@ With waveform augmentation already applied, additional SpecAugment was generally
 
 This suggests that waveform and spectrogram augmentation are partially redundant for mel-spectrogram models but complementary for MFCC models.
 
-### 9.3 Remaining Limitations
+### 10.3 Remaining Limitations
 
 - **"Normal Start-Up" remains the weakest class** (55.6% recall for M6, 44.4% for Tier 3). With only 43 original samples, even 12x augmentation produces limited acoustic diversity. All augmented variants derive from the same 43 source recordings.
 - **Small test set.** With 208 test samples (143 for Tier 3), per-class metrics have high variance. Differences of 1-2 samples can swing F1 scores by several percentage points.
@@ -345,25 +413,35 @@ This suggests that waveform and spectrogram augmentation are partially redundant
 
 ---
 
-## 10. Reproducibility
+## 11. Reproducibility
 
-### 10.1 How to Reproduce
+### 11.1 How to Reproduce
 
 ```bash
 source .venv/bin/activate
-python src/generate_augmented_data.py   # ~20 seconds
-python src/train_nn.py                  # ~22 minutes on GPU
+
+# Generate noise-augmented data (requires noise bank from notebooks/04 + 05)
+# Run notebooks/05_noise_augmentation.ipynb
+
+# Train on noise-augmented data (Condition C, default)
+python src/train_nn.py                  # ~6 minutes on GPU (no HP search)
+
+# To train on synthetic-augmented data (Condition B), edit src/train_nn.py:
+#   AUGMENTATION_VARIANT = "standard"
+# To train on original data (Condition A):
+#   AUGMENTATION_VARIANT = "none"
 ```
 
 Requires TensorFlow 2.18 with GPU support.
 
-### 10.2 Output Artifacts
+### 11.2 Output Artifacts
 
 | Artifact | Location |
 |----------|----------|
-| Augmented training features | `data/features/{mel_spectrograms,mfcc}/train_augmented.npz` |
-| Augmented normalization stats | `data/normalization_stats_augmented.npz` |
-| Augmentation report | `data/augmentation_report.json` |
+| Noise-augmented training features | `data/features/{mel_spectrograms,mfcc}/train_noise_augmented.npz` |
+| Noise-augmented normalization stats | `data/normalization_stats_noise_augmented.npz` |
+| Noise augmentation report | `data/noise_augmentation_report.json` |
+| Noise bank | `data/noise_bank/noise_bank.npz` |
 | M2 float32 models | `models/m2_cnn2d_float32/tier{1,2,3}_best.h5` |
 | M5 float32 models | `models/m5_cnn1d_int8_qat/tier{1,2,3}_best.h5` |
 | M6 float32 models | `models/m6_dscnn_int8_qat/tier{1,2,3}_best.h5` |
@@ -374,10 +452,14 @@ Requires TensorFlow 2.18 with GPU support.
 | Confusion matrices | `results/cm_m{2,5,6}_tier_{1,2,3}[_norm].png` |
 | ROC curves (Tier 1) | `results/roc_m{2,5,6}_tier_1.png` |
 | Summary CSV | `results/nn_summary.csv` |
+| Condition B archive | `results/nn_summary_condition_b.csv` |
+| Condition C archive | `results/nn_summary_condition_c.csv` |
 | Full results JSON | `results/nn_evaluation_results.json` |
 | Analysis notebook | `notebooks/03_neural_networks.ipynb` |
+| Noise analysis notebook | `notebooks/04_noise_analysis.ipynb` |
+| Noise augmentation notebook | `notebooks/05_noise_augmentation.ipynb` |
 
-### 10.3 Software Versions
+### 11.3 Software Versions
 
 | Package | Version |
 |---------|---------|
