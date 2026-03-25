@@ -4,6 +4,34 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-24 — Phase 5: Arduino Deployment (Code Complete)
+
+**What was done:**
+- Created `src/export_for_arduino.py` — generates all C headers from Python (model bytes, sparse mel filterbank, normalization stats, Hann window). Extracts quantization params and TFLite ops from the model.
+- Created `src/validate_features.py` — feature parity validation comparing simulated on-device algorithm (manual FFT + sparse mel filterbank + global-max log + z-score) against librosa training pipeline
+- Created Arduino sketch in `arduino/car_sound_classifier/` (8 files):
+  - `car_sound_classifier.ino` — main sketch with PDM capture, feature extraction, TFLite Micro inference, Serial output
+  - `feature_extraction.cpp/.h` — CMSIS-DSP mel-spectrogram computation (5 phases: peak norm, frame FFT, mel energy, log conversion, z-score)
+  - `config.h` — all compile-time constants
+  - 4 generated headers: `model_data.h` (M6 PTQ, 21.3 KB), `mel_filterbank.h` (sparse, 490 weights), `normalization.h`, `hann_window.h`
+- Created `src/playback_test.py` — automated playback evaluation: plays test set audio through speaker, captures Arduino predictions over Serial, computes full evaluation metrics
+- Created `docs/deployment_results.md` — deployment documentation
+
+**Feature parity validation results (24 clips, all PASS):**
+- Cosine similarity: 1.0000 (perfect match between simulated on-device and librosa)
+- Int8 exact match rate: 96.3% (3.7% differ by rounding at quantization boundaries)
+- Mean absolute error (int8): 0.04 (acceptance threshold: <= 2.0)
+
+**Key design decisions:**
+- Sparse mel filterbank reduces flash from 40.2 KB to 2.1 KB (95.2% sparse)
+- `ref=np.max` log normalization makes pipeline scale-invariant, eliminating CMSIS-DSP vs numpy FFT scaling concerns
+- Machine-readable `RESULT|...` output format enables automated evaluation by `playback_test.py`
+- AllOpsResolver used for initial deployment (simplicity); switch to MicroMutableOpResolver for production
+
+**Status:** Code complete. Awaiting Arduino hardware for compilation, flashing, and playback test. Feature parity validated in Python — on-device accuracy should closely match PC int8 evaluation (F1=0.7835).
+
+---
+
 ## 2026-03-24 — Phase 4 Complete: Quantization (PTQ & QAT)
 
 **What was done:**
