@@ -4,6 +4,41 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-24 — Phase 4 Complete: Quantization (PTQ & QAT)
+
+**What was done:**
+- Implemented `src/quantize_nn.py` — full quantization pipeline: retrain float32 models under tf_keras, PTQ conversion, QAT fine-tuning, int8 TFLite evaluation, quantization impact analysis, visualizations
+- Retrained M5/M6 on Condition B (their best training condition) and M2 on Condition D under legacy Keras (tf_keras) for .h5 compatibility with `tensorflow-model-optimization`
+- Produced 15 int8 TFLite models: 9 PTQ (all architectures) + 6 QAT (M2 and M6; M5 Conv1D not supported by tfmot)
+- Computed full quantization impact: accuracy/F1 deltas, prediction agreement rates, McNemar's significance tests, confidence distribution analysis
+- Created `docs/quantization_results.md` — research-paper documentation of methods, results, and analysis
+
+**Key results (Tier 2 — primary deployment target):**
+
+| Model | Method | Int8 F1 Macro | Size (KB) | Delta F1 | Agreement |
+|-------|--------|--------------|-----------|----------|-----------|
+| M6 DS-CNN | PTQ | **0.7835** | 21.3 | -0.001 | 98.6% |
+| M6 DS-CNN | QAT | 0.7774 | 22.3 | +0.005 | 95.2% |
+| M2 2-D CNN | QAT | 0.7426 | 20.5 | +0.001 | 95.7% |
+| M2 2-D CNN | PTQ | 0.7413 | 20.1 | +0.003 | 99.0% |
+| M5 1-D CNN | PTQ | 0.6138 | 15.2 | -0.015 | 99.0% |
+
+**Key findings:**
+- **Quantization is nearly lossless.** No model-tier-method combination shows a statistically significant accuracy change (all McNemar p > 0.05). Int8 models perform as well as float32 on this task.
+- **PTQ is sufficient.** PTQ performs as well as or slightly better than QAT across all architectures. The small model sizes (6K-15K parameters) and BatchNorm folding leave minimal quantization error.
+- **M6 DS-CNN PTQ is the recommended deployment model.** Highest Tier 2 F1 (0.7835), 21.3 KB size, estimated ~35-45 KB tensor arena — all well within hardware budgets.
+- **M5 QAT is not possible.** The `tfmot` library (v0.8.0) does not support Conv1D layers. M5 uses PTQ only, which is adequate given PTQ's strong performance.
+- **Model sizes:** M2: 20 KB, M5: 15 KB, M6: 21 KB — all far under the 150 KB flash budget. The 4-12x compression from float32 .h5 exceeds the theoretical 4x because .h5 includes optimizer state and metadata.
+
+**Technical notes:**
+- Required `tf_keras==2.18.0` and `TF_USE_LEGACY_KERAS=1` environment variable for `tensorflow-model-optimization` compatibility with TF 2.18
+- TF 2.21 cuDNN autotuner issue persists — TF 2.18 remains required for GPU training
+- QAT used 10x lower learning rate than original training (M2: 0.0002, M6: 0.0002) with 30 max epochs and patience=10 early stopping
+
+**Status:** Phase 4 complete. 15 int8 TFLite models produced. M6 DS-CNN PTQ selected as primary deployment candidate. Ready for Phase 5 (Arduino deployment).
+
+---
+
 ## 2026-03-22 — Real-World Noise Data Collection + Noise-Augmented Training (Condition C)
 
 **What was done:**
