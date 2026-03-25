@@ -191,9 +191,39 @@ record 20                 # Record more clips
 
 WAV files are saved automatically to `data/noise_samples/{label}/`.
 
+---
+
+## Step 10: Quantize Neural Networks to Int8 (Phase 4)
+
+Quantize the float32 models to int8 TFLite for Arduino deployment. This script retrains each architecture on its best training condition, then converts via PTQ and QAT.
+
+```bash
+python src/quantize_nn.py
+```
+
+**Runtime:** ~14 minutes on GPU.
+
+**What it produces:**
+
+| File | Description |
+|------|-------------|
+| `models/m3_cnn2d_int8_ptq/tier{1,2,3}.tflite` | M2 Post-Training Quantized models |
+| `models/m4_cnn2d_int8_qat/tier{1,2,3}.tflite` | M2 Quantization-Aware Trained models |
+| `models/m5_cnn1d_int8_qat/tier{1,2,3}_ptq.tflite` | M5 PTQ models (QAT not supported for Conv1D) |
+| `models/m6_dscnn_int8_qat/tier{1,2,3}_ptq.tflite` | M6 PTQ models |
+| `models/m6_dscnn_int8_qat/tier{1,2,3}.tflite` | M6 QAT models |
+| `results/quantization_results.json` | Full evaluation metrics for all int8 models |
+| `results/quantization_summary.csv` | Summary comparison table |
+
+The script configures which training condition each architecture uses (M2: Condition D, M5/M6: Condition B). These can be changed by editing `MODEL_CONDITIONS` at the top of `src/quantize_nn.py`.
+
+**Note:** Requires `tensorflow-model-optimization` and `tf_keras` packages. The script sets `TF_USE_LEGACY_KERAS=1` automatically for compatibility.
+
+---
+
 ## What's Next
 
-Later phases (quantization, deployment) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
+Phase 5 (Arduino deployment) and Phase 6 (on-device evaluation) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
 
 ## Troubleshooting
 
@@ -212,3 +242,4 @@ Later phases (quantization, deployment) will be added to this guide as they are 
 | Train classical ML baselines | `python src/train_classical.py` |
 | Generate augmented data | `python src/generate_augmented_data.py` |
 | Train neural networks | `python src/train_nn.py` |
+| Quantize to int8 | `python src/quantize_nn.py` |
