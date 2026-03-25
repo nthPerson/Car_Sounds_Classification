@@ -4,6 +4,33 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-25 — Phase 5: On-Device Testing and CMSIS-NN Optimization Investigation
+
+**What was done:**
+- Successfully compiled and uploaded the car sound classifier sketch to the Arduino Nano 33 BLE Sense Rev2
+- Measured actual resource usage: 319 KB flash (33%), 175 KB SRAM (68%), 64 KB tensor arena (63,556 bytes used)
+- Switched from `AllOpsResolver` to `MicroMutableOpResolver<5>` — saved 165 KB flash (484 KB → 319 KB)
+- Increased tensor arena from 50 KB to 64 KB after `AllocateTensors()` reported needing 59,456 bytes
+- Built TFLite Micro from source with CMSIS-NN optimized kernels for Cortex-M4 SIMD acceleration
+- Packaged as Arduino-compatible library (`TensorFlowLite_CMSIS_NN`), resolving include path conflicts, duplicate symbol issues, ACLE intrinsic compatibility, and `CMSIS_NN` preprocessor guards
+
+**Measured on-device performance:**
+- Audio capture: 1,490 ms (fixed, 1.5s @ 16 kHz)
+- Feature extraction: ~197 ms (CMSIS-DSP FFT mel-spectrogram)
+- Model inference: ~783 ms (M6 DS-CNN int8, 6M MACs, 8.4 cycles/MAC)
+- Total cycle: ~2,470 ms (one classification every 2.5 seconds)
+
+**CMSIS-NN SIMD investigation result:**
+- Built CMSIS-NN from tflite-micro source — compiled successfully on Arduino
+- Achieved only 5% speedup (828 ms → 783 ms) instead of expected 4.6x
+- Root cause: Arduino's bundled GCC 7.2.1 lacks ACLE intrinsic support for `__sxtb16`, `__smlabb`, `__smlatt` — CMSIS-NN selects SIMD code paths but compiler cannot emit SIMD instructions
+- Pre-compiled `.a` approach (GCC 14.3.1 with real SIMD) failed due to C++ ABI incompatibility
+- Conclusion: Full CMSIS-NN SIMD requires GCC 10+ (not available in Arduino Mbed OS board package v4.5.0)
+
+**Status:** Deployment complete and functional. Classifier runs continuously. Ready for playback test evaluation.
+
+---
+
 ## 2026-03-24 — Phase 5: Arduino Deployment (Code Complete)
 
 **What was done:**

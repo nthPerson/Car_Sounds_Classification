@@ -10,7 +10,8 @@
  *
  * Setup:
  *   1. Install "Arduino Mbed OS Nano Boards" via Boards Manager
- *   2. Install "Arduino_TensorFlowLite" via Library Manager
+ *   2. Install "TensorFlowLite_CMSIS_NN" library (custom build with
+ *      CMSIS-NN optimized kernels for Cortex-M4 SIMD acceleration)
  *   3. Select Board: Arduino Nano 33 BLE
  *   4. Upload this sketch
  *   5. Open Serial Monitor at 115200 baud
@@ -26,6 +27,7 @@
 #include <tensorflow/lite/micro/micro_interpreter.h>
 #include <tensorflow/lite/micro/micro_log.h>
 #include <tensorflow/lite/schema/schema_generated.h>
+#include <tensorflow/lite/micro/cortex_m_generic/debug_log_callback.h>
 
 #include "config.h"
 #include "model_data.h"
@@ -204,11 +206,28 @@ void setup() {
         delay(10);  // Wait for Serial Monitor
     }
 
+    // Route TFLite Micro debug log to Arduino Serial
+    RegisterDebugLogCallback([](const char* s) { Serial.print(s); });
+
     Serial.println("============================================================");
     Serial.println("  Car Sound Classifier — Arduino Nano 33 BLE Sense Rev2");
     Serial.println("============================================================");
     Serial.print("Model: ");
     Serial.println(MODEL_NAME);
+
+    // CMSIS-NN SIMD diagnostic — verify compile-time feature detection
+    Serial.print("CMSIS-NN SIMD: ");
+#if defined(__ARM_FEATURE_DSP) && (__ARM_FEATURE_DSP == 1)
+    Serial.println("ENABLED (__ARM_FEATURE_DSP=1)");
+#else
+    Serial.println("DISABLED (no __ARM_FEATURE_DSP — SIMD not active!)");
+#endif
+    Serial.print("Compiler: GCC ");
+    Serial.print(__GNUC__);
+    Serial.print(".");
+    Serial.print(__GNUC_MINOR__);
+    Serial.print(".");
+    Serial.println(__GNUC_PATCHLEVEL__);
 
     // Initialize feature extraction (CMSIS-DSP FFT)
     feature_extraction_init();

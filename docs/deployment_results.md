@@ -162,42 +162,98 @@ RESULT|1|3|0.8470|134.5|89.2|1725.0|0.012,0.003,0.089,0.847,0.031,0.018
 
 ---
 
-## 7. Memory Usage
+## 7. Memory Usage (Measured)
 
-*Note: Actual values will be filled in after compilation and on-device testing.*
+### 7.1 Compilation Output
 
-### 7.1 Estimated SRAM Budget (M6 DS-CNN)
+```
+Sketch uses 326,824 bytes (33%) of program storage space. Maximum is 983,040 bytes.
+Global variables use 178,688 bytes (68%) of dynamic memory, leaving 83,456 bytes for local variables.
+```
 
-| Component | Bytes | Notes |
-|-----------|-------|-------|
-| Mbed OS + Arduino core | ~40,960 | Fixed overhead |
-| Audio buffer (int16[24000]) | 48,000 | PDM capture |
-| Mel spectrogram (float[3680]) | 14,720 | Feature output |
-| Model input (int8[3680]) | 3,680 | Quantized features |
-| Feature workspace | ~5,120 | FFT buffers, reused |
-| Tensor arena | ~50,000 | M6 DS-CNN |
-| TFLite interpreter | ~10,240 | Op resolver, metadata |
-| Serial + misc | ~5,120 | |
-| **Total** | **~178 KB** | |
-| **Headroom** | **~78 KB** | |
+### 7.2 SRAM Budget (Measured)
 
-### 7.2 Estimated Flash Budget
+| Component | Estimated | Actual | Notes |
+|-----------|-----------|--------|-------|
+| Static globals (compiler-reported) | ~178 KB | 174.5 KB (68%) | Includes Mbed OS, buffers, arena |
+| Tensor arena (allocated) | ~50 KB | 65,536 bytes | 64 KB arena, 63,556 used |
+| Remaining for stack/heap | ~78 KB | 83,456 bytes (32%) | Comfortable headroom |
 
-| Component | KB |
-|-----------|-----|
-| Mbed OS + Arduino core | ~300 |
-| TFLite Micro + CMSIS-NN | ~80 |
-| Feature extraction | ~20 |
-| Mel filterbank (sparse) | 2.1 |
-| Hann window | 2.0 |
-| Model (M6 PTQ) | 21.3 |
-| App code + config | ~10 |
-| **Total** | **~436** |
-| **Headroom** | **~588** |
+### 7.3 Flash Budget (Measured)
+
+| Component | Estimated | Actual | Notes |
+|-----------|-----------|--------|-------|
+| Total flash | ~436 KB (43%) | 319 KB (33%) | With MicroMutableOpResolver (5 ops) |
+| Flash headroom | ~588 KB | 664 KB | 67% of flash available |
+
+The `MicroMutableOpResolver<5>` (registering only Conv2D, DepthwiseConv2D, FullyConnected, Mean, Softmax) reduced flash from 484 KB (50%) with `AllOpsResolver` to 319 KB (33%) --- a 165 KB (34%) savings.
 
 ---
 
-## 8. Playback Test
+## 8. Inference Latency (Measured)
+
+### 8.1 Timing Breakdown
+
+| Phase | Duration | Notes |
+|-------|----------|-------|
+| Audio capture | 1,490 ms | Fixed: 1.5s at 16 kHz (PDM mic) |
+| Feature extraction | ~197 ms | Mel-spectrogram via CMSIS-DSP FFT |
+| Model inference | ~783 ms | M6 DS-CNN int8, 6M MACs |
+| **Total cycle** | **~2,470 ms** | One classification every ~2.5 seconds |
+
+### 8.2 Inference Performance Analysis
+
+The M6 DS-CNN model contains approximately 6,006,000 multiply-accumulate (MAC) operations:
+
+| Layer | MACs | Share |
+|-------|------|-------|
+| Conv2D(32, 4x10, stride=2) | 1,177,600 | 19.6% |
+| 4x DepthwiseConv2D(32, 3x3) | 1,059,840 | 17.6% |
+| 4x Pointwise Conv2D(32, 1x1) | 3,768,320 | 62.8% |
+| Dense(6) | 192 | 0.0% |
+| **Total** | **6,005,952** | |
+
+At 783 ms inference on a 64 MHz clock:
+
+```
+783 ms x 64 MHz = 50.1 million cycles
+50.1M cycles / 6.0M MACs = 8.4 cycles per MAC
+```
+
+| Implementation | Cycles/MAC | Expected Inference |
+|---------------|-----------|-------------------|
+| Reference (no SIMD) | ~10 | ~938 ms |
+| **Measured (CMSIS-NN, GCC 7.2.1)** | **~8.4** | **~783 ms** |
+| CMSIS-NN with SIMD (theoretical) | ~3 | ~282 ms |
+| Ideal SIMD (theoretical) | ~1.5 | ~141 ms |
+
+### 8.3 CMSIS-NN SIMD Investigation
+
+We investigated optimizing inference latency by building TensorFlow Lite Micro from source with CMSIS-NN optimized kernels, which use Cortex-M4 DSP extension SIMD instructions (`SMLAD`, `SXTB16`, `PKHBT`) to process two int8 multiplications per cycle. ARM's published benchmarks report a 4.6x speedup with CMSIS-NN, which would reduce our inference from 783 ms to approximately 170 ms.
+
+**Build process:**
+
+1. Cloned the [official tflite-micro repository](https://github.com/tensorflow/tflite-micro)
+2. Generated a source tree with CMSIS-NN:
+   ```
+   python3 create_tflm_tree.py \
+     --makefile_options="TARGET=cortex_m_generic TARGET_ARCH=cortex-m4+fp OPTIMIZED_KERNEL_DIR=cmsis_nn" \
+     --rename_cc_to_cpp /tmp/tflm_cmsis_nn_arduino
+   ```
+3. Packaged the output as an Arduino-compatible library (`TensorFlowLite_CMSIS_NN`)
+4. Resolved include path issues (flatbuffers, gemmlowp, ruy, kissfft), duplicate symbol conflicts, and missing ACLE intrinsic definitions
+
+**Result: The CMSIS-NN library compiled and ran successfully, but achieved only a 5% speedup (828 ms -> 783 ms) instead of the expected 4.6x.**
+
+**Root cause:** The Arduino Mbed OS Nano Boards package bundles GCC 7.2.1 (2017), which lacks support for several ARM C Language Extension (ACLE) intrinsics (`__sxtb16`, `__smlabb`, `__smlatt`) that CMSIS-NN requires for SIMD code paths. While the compiler correctly sets `__ARM_FEATURE_DSP=1` for the Cortex-M4 target, its `arm_acle.h` header does not implement the corresponding intrinsic functions. We provided compatibility shims using inline assembly, but GCC 7.2.1 does not reliably emit the SIMD instructions from these shims.
+
+We also attempted a pre-compiled approach: building the TFLite Micro static library (`.a`) with ARM GCC 14.3.1 (which fully supports ACLE intrinsics and verified 1,640 SIMD instructions in the binary), then linking it with the Arduino sketch. This failed due to C++ ABI incompatibilities between GCC 14.3.1 and GCC 7.2.1 (template instantiation and vtable layout differences).
+
+**Conclusion:** Achieving full CMSIS-NN SIMD acceleration on the Arduino Nano 33 BLE requires upgrading the ARM GCC toolchain beyond version 7.2.1. This is a known limitation of the Arduino Mbed OS board package (v4.5.0). The 783 ms inference (8.4 cycles/MAC) represents the best achievable performance with the current Arduino toolchain. For production deployments requiring faster inference, alternatives include PlatformIO with a newer GCC toolchain, or the nRF Connect SDK which ships with GCC 12+.
+
+---
+
+## 9. Playback Test
 
 *Section to be completed after running `python src/playback_test.py` with the Arduino.*
 
@@ -212,9 +268,9 @@ Expected accuracy degradation vs PC evaluation: 5-20% (per evaluation plan Secti
 
 ---
 
-## 9. Reproducibility
+## 10. Reproducibility
 
-### 9.1 Export and Compile
+### 10.1 Export and Compile
 
 ```bash
 # Generate C headers
@@ -225,27 +281,46 @@ python src/validate_features.py
 
 # Open in Arduino IDE, compile, and upload
 # Board: Arduino Nano 33 BLE
-# Library: Arduino_TensorFlowLite
+# Library: TensorFlowLite_CMSIS_NN (custom build from tflite-micro source)
 ```
 
-### 9.2 Run Playback Test
+### 10.2 Build TFLite Micro with CMSIS-NN (Optional)
+
+To rebuild the TFLite Micro library with CMSIS-NN from source:
+
+```bash
+# Prerequisites: arm-none-eabi-gcc (sudo apt install gcc-arm-none-eabi)
+git clone --depth 1 https://github.com/tensorflow/tflite-micro.git /tmp/tflite-micro
+
+cd /tmp/tflite-micro
+python3 tensorflow/lite/micro/tools/project_generation/create_tflm_tree.py \
+  --makefile_options="TARGET=cortex_m_generic TARGET_ARCH=cortex-m4+fp OPTIMIZED_KERNEL_DIR=cmsis_nn" \
+  --rename_cc_to_cpp \
+  /tmp/tflm_cmsis_nn_arduino
+```
+
+The generated source tree requires packaging as an Arduino library with include path fixes. See the `TensorFlowLite_CMSIS_NN` library in the Arduino libraries folder for the final packaged version.
+
+### 10.3 Run Playback Test
 
 ```bash
 python src/playback_test.py --port /dev/ttyS3 --num-clips 208 --delay 3.0
 ```
 
-### 9.3 Software Versions
+### 10.4 Software Versions
 
 | Component | Version |
 |-----------|---------|
 | Arduino IDE | 2.x |
-| Board support | Arduino Mbed OS Nano Boards |
-| TFLite Micro | Arduino_TensorFlowLite (Library Manager) |
+| Board support | Arduino Mbed OS Nano Boards 4.5.0 |
+| ARM GCC (Arduino) | 7.2.1 (7-2017q4) |
+| TFLite Micro | Built from source (tflite-micro, March 2026) |
+| CMSIS-NN | Built from source (via tflite-micro) |
 | Python | 3.12 |
 | TensorFlow | 2.18.0 |
 | librosa | >= 0.10.0 |
 
-### 9.4 Output Artifacts
+### 10.5 Output Artifacts
 
 | Artifact | Location |
 |----------|----------|
