@@ -4,6 +4,32 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-25 — Phase 5: Playback Test Complete
+
+**What was done:**
+- Ran the automated playback evaluation (`src/playback_test.py`) with all 208 test clips on two playback configurations
+- Fixed synchronization: modified Arduino sketch to use triggered mode (`READY`/`AUTO`/`STOP` commands) instead of continuous classification, and updated playback script to wait for "Listening..." before playing audio
+- Fixed `KeyError: 'report_str'` in playback script (correct key: `classification_report_str`)
+
+**Results — Speaker Hardware Ablation:**
+
+| Metric | Laptop Speakers | Bluetooth Speaker | PC Int8 |
+|--------|----------------|-------------------|---------|
+| Accuracy | 0.2500 | **0.6827** | 0.7837 |
+| F1 Macro | 0.1540 | **0.5465** | 0.7835 |
+| Degradation | -80.3% | **-30.3%** | — |
+
+- Laptop speakers failed catastrophically: 72% of predictions were startup classes due to missing bass response (speakers roll off below ~300 Hz, losing engine idle/braking low-frequency content)
+- Bluetooth speaker restored performance to 68.3% accuracy with 30.3% F1 degradation from PC evaluation
+- Braking Fault achieved PC-equivalent recall (81.8%) through Bluetooth speaker
+- Confidence well-calibrated: correct=0.81, incorrect=0.66
+
+**Key finding:** Audio reproduction quality is the dominant factor in playback test performance. In real deployment (mic near actual engine), there is no speaker in the signal path, so the Bluetooth results represent a conservative lower bound.
+
+**Status:** Phase 5 complete. All four evaluation dimensions now have data. Ready for Phase 6 (Evaluation & Reporting).
+
+---
+
 ## 2026-03-25 — Phase 5: On-Device Testing and CMSIS-NN Optimization Investigation
 
 **What was done:**

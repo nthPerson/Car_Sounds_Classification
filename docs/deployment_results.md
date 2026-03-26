@@ -1,7 +1,7 @@
 # Deployment Results — Phase 5 Documentation
 
 **Phase:** 5 (Arduino Deployment)
-**Date:** March 24, 2026
+**Date:** March 24--25, 2026
 **Related code:** `src/export_for_arduino.py`, `src/validate_features.py`, `src/playback_test.py`, `arduino/car_sound_classifier/`
 
 ---
@@ -255,16 +255,82 @@ We also attempted a pre-compiled approach: building the TFLite Micro static libr
 
 ## 9. Playback Test
 
-*Section to be completed after running `python src/playback_test.py` with the Arduino.*
+The playback test plays all 208 test set audio clips through a speaker while the Arduino captures and classifies via its PDM microphone. This evaluates the complete end-to-end system (Evaluation Dimension D4) including speaker frequency response, microphone frequency response, room acoustics, ambient noise, on-device feature extraction fidelity, and model inference accuracy.
 
-The playback test plays all 208 test set audio clips through a speaker while the Arduino captures and classifies via its PDM microphone. This evaluates the complete end-to-end system including:
-- Speaker frequency response
-- Microphone frequency response
-- Room acoustics and ambient noise
-- On-device feature extraction fidelity
-- Model inference accuracy
+The test was conducted twice with different playback hardware to assess the impact of audio reproduction quality on classification accuracy.
 
-Expected accuracy degradation vs PC evaluation: 5-20% (per evaluation plan Section 6.3).
+### 9.1 Test Protocol
+
+1. The Python script (`src/playback_test.py`) sends a `READY` command over serial to the Arduino
+2. The Arduino enters a 1.5-second capture window, printing `"Listening..."` to confirm
+3. The script detects the `"Listening..."` message and immediately plays the audio clip through the speaker
+4. The Arduino captures the audio through its PDM microphone, computes a mel-spectrogram, and runs int8 inference
+5. The Arduino sends a `RESULT|...` line with the prediction, confidence, and timing
+6. The script compares the prediction against the ground-truth label
+7. A 3-second delay separates consecutive clips
+
+Both tests used all 208 test set clips at 0.8 volume, with the speaker positioned approximately 15 cm from the Arduino's PDM microphone. The Arduino was running in triggered mode (not continuous) to ensure each classification corresponded to a specific test clip.
+
+### 9.2 Results Summary
+
+| Metric | Laptop Speakers | Bluetooth Speaker | PC Int8 Reference |
+|--------|----------------|-------------------|-------------------|
+| **Accuracy** | 0.2500 | **0.6827** | 0.7837 |
+| **F1 Macro** | 0.1540 | **0.5465** | 0.7835 |
+| **F1 Weighted** | 0.2825 | **0.7162** | 0.7835 |
+| **Degradation (F1 Macro)** | -80.3% | **-30.3%** | --- |
+
+### 9.3 Per-Class Recall Comparison
+
+| Class | Laptop Speakers | Bluetooth Speaker | PC Int8 |
+|-------|----------------|-------------------|---------|
+| Normal Braking (n=12) | 0.000 | 0.333 | 0.750 |
+| Braking Fault (n=11) | 0.091 | **0.818** | 0.818 |
+| Normal Idle (n=40) | 0.025 | 0.575 | 0.675 |
+| Idle Fault (n=118) | 0.314 | **0.780** | 0.864 |
+| Normal Start-Up (n=9) | 0.556 | 0.444 | 0.778 |
+| Start-Up Fault (n=18) | 0.444 | 0.556 | 0.556 |
+
+### 9.4 Confusion Matrix (Bluetooth Speaker)
+
+```
+True \ Predicted    NrmBrk  BrkFlt  NrmIdl  IdlFlt  NrmSU  SUFlt
+Normal Braking           4       6       0       2      0      0
+Braking Fault            0       9       1       1      0      0
+Normal Idle              0       5      23       3      7      2
+Idle Fault               0       3       1      92     16      6
+Normal Start-Up          0       0       0       2      4      3
+Start-Up Fault           0       0       0       4      4     10
+```
+
+### 9.5 Confidence Calibration (Bluetooth Speaker)
+
+| Prediction | Count | Mean Confidence |
+|-----------|-------|-----------------|
+| Correct | 142 (68.3%) | 0.808 |
+| Incorrect | 66 (31.7%) | 0.655 |
+
+The model's confidence is well-calibrated for deployment: correct predictions are made with significantly higher confidence (0.81) than incorrect ones (0.66), enabling a confidence threshold to be used for filtering unreliable predictions.
+
+### 9.6 Speaker Hardware Ablation Analysis
+
+The two playback runs reveal the impact of audio reproduction quality on the end-to-end system:
+
+**Laptop speakers (built-in):** The laptop speakers have a frequency response that rolls off sharply below ~300 Hz and has limited dynamic range. This caused 72.1% of all predictions to fall into the Start-Up classes (Normal Start-Up or Start-Up Fault), regardless of the true label. Car engine idle and braking sounds contain significant low-frequency content (50--500 Hz) that laptop speakers cannot reproduce, causing their spectral signature to shift toward what startup sounds look like (which have more transient mid/high-frequency content). This represents a severe domain gap introduced by the playback hardware, not by the classifier.
+
+**Bluetooth speaker:** A Bluetooth speaker with a larger driver and better bass response restored the low-frequency content needed for the classifier to distinguish between operational states. Accuracy improved from 25.0% to 68.3% (2.7x). The Braking Fault class achieved PC-equivalent recall (81.8%), and Idle Fault came within 8.4 percentage points of the PC reference.
+
+**Implication:** The classifier's real-world performance is highly sensitive to the acoustic fidelity of the signal path. In actual deployment (where the PDM microphone is positioned near a real engine), there is no speaker in the signal path, and the microphone would capture the full frequency range of the engine sounds. The Bluetooth speaker playback test therefore represents a conservative lower bound on real-world deployment accuracy.
+
+### 9.7 Latency (Consistent Across Both Runs)
+
+| Metric | Mean | Std |
+|--------|------|-----|
+| Feature extraction | 197.4 ms | 0.2 ms |
+| Inference | 784.9 ms | 0.2 ms |
+| Total cycle | 2,472.5 ms | 0.4 ms |
+
+Latency is extremely consistent (< 1 ms standard deviation), demonstrating deterministic real-time behavior suitable for deployment.
 
 ---
 
@@ -314,20 +380,47 @@ python src/playback_test.py --port /dev/ttyS3 --num-clips 208 --delay 3.0
 | Arduino IDE | 2.x |
 | Board support | Arduino Mbed OS Nano Boards 4.5.0 |
 | ARM GCC (Arduino) | 7.2.1 (7-2017q4) |
-| TFLite Micro | Built from source (tflite-micro, March 2026) |
-| CMSIS-NN | Built from source (via tflite-micro) |
+| TFLite Micro | Built from source ([tensorflow/tflite-micro](https://github.com/tensorflow/tflite-micro), March 2026) |
+| CMSIS-NN | Built from source (via tflite-micro `OPTIMIZED_KERNEL_DIR=cmsis_nn`) |
+| CMSIS-DSP | Arduino_CMSIS-DSP library (for on-device FFT) |
 | Python | 3.12 |
 | TensorFlow | 2.18.0 |
 | librosa | >= 0.10.0 |
 
-### 10.5 Output Artifacts
+### 10.5 TFLite Micro Build from Source
+
+The TFLite Micro library was built from source with CMSIS-NN optimized kernels to replace the archived `Arduino_TensorFlowLite` library (which was deprecated in February 2025). The build process:
+
+1. Clone the official tflite-micro repository
+2. Generate an Arduino-compatible source tree with CMSIS-NN:
+   ```bash
+   git clone --depth 1 https://github.com/tensorflow/tflite-micro.git
+   cd tflite-micro
+   python3 tensorflow/lite/micro/tools/project_generation/create_tflm_tree.py \
+     --makefile_options="TARGET=cortex_m_generic TARGET_ARCH=cortex-m4+fp OPTIMIZED_KERNEL_DIR=cmsis_nn" \
+     --rename_cc_to_cpp \
+     /tmp/tflm_cmsis_nn_arduino
+   ```
+3. Package the output as an Arduino library (`TensorFlowLite_CMSIS_NN`) with:
+   - Include path fixes for `flatbuffers/`, `ruy/`, `gemmlowp/`, and `kissfft`
+   - `#define CMSIS_NN` injected into 14 kernel headers to select optimized declarations
+   - ACLE intrinsic compatibility shims (`arm_acle_compat.h`) for GCC 7.2.1
+   - Removal of `micro_time.cpp` (uses DWT registers unavailable in Arduino Mbed environment)
+   - KissFFT `.c` files renamed to `.inc` to prevent duplicate symbol compilation
+
+The resulting library is installed at the Arduino libraries folder as `TensorFlowLite_CMSIS_NN` and provides `MicroMutableOpResolver`, `MicroInterpreter`, and all required TFLite Micro headers for the sketch.
+
+### 10.6 Output Artifacts
 
 | Artifact | Location |
 |----------|----------|
-| Arduino sketch | `arduino/car_sound_classifier/` (8 files) |
+| Arduino sketch | `arduino/car_sound_classifier/` (9 files) |
 | Export script | `src/export_for_arduino.py` |
 | Feature validation | `src/validate_features.py` |
 | Feature parity results | `results/feature_parity_results.json` |
 | Playback test script | `src/playback_test.py` |
-| Playback test results | `results/playback_test_results.json` |
+| Playback results (laptop) | `results/playback_test_results_laptop_speakers.json` |
+| Playback results (Bluetooth) | `results/playback_test_results_bluetooth_speaker.json` |
+| Playback summary (laptop) | `results/playback_test_summary_laptop_speakers.csv` |
+| Playback summary (Bluetooth) | `results/playback_test_summary_bluetooth_speaker.csv` |
 | Playback confusion matrices | `results/cm_playback_tier_2[_norm].png` |

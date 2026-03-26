@@ -304,12 +304,18 @@ void setup() {
     Serial.println();
 
     Serial.println();
-    Serial.println("Ready. Send 'READY' to trigger classification,");
-    Serial.println("or the classifier will run continuously.");
+    Serial.println("Commands:");
+    Serial.println("  READY    — Trigger one capture-classify cycle");
+    Serial.println("  AUTO     — Start continuous classification");
+    Serial.println("  STOP     — Stop continuous classification");
+    Serial.println();
+    Serial.println("Mode: TRIGGERED (send 'READY' or 'AUTO' to begin)");
     Serial.println();
 }
 
 // ─── Loop ───────────────────────────────────────────────────────────────
+
+bool continuousMode = false;
 
 void loop() {
     // Check for serial commands
@@ -318,10 +324,15 @@ void loop() {
         if (c == '\n' || c == '\r') {
             serialBuffer[serialPos] = '\0';
             if (serialPos > 0) {
-                // Process command
                 if (strncmp(serialBuffer, "READY", 5) == 0) {
-                    // Triggered mode: run one inference immediately
+                    // Triggered mode: run one inference
                     runInference();
+                } else if (strncmp(serialBuffer, "AUTO", 4) == 0) {
+                    continuousMode = true;
+                    Serial.println("Mode: CONTINUOUS");
+                } else if (strncmp(serialBuffer, "STOP", 4) == 0) {
+                    continuousMode = false;
+                    Serial.println("Mode: TRIGGERED");
                 }
             }
             serialPos = 0;
@@ -330,6 +341,8 @@ void loop() {
         }
     }
 
-    // Continuous mode: run inference in a loop
-    runInference();
+    // Only run continuously if AUTO mode is enabled
+    if (continuousMode) {
+        runInference();
+    }
 }

@@ -206,9 +206,17 @@ def main():
 
         # Send READY command to trigger capture
         ser.write(b"READY\n")
-        time.sleep(0.5)  # Brief pause for Arduino to start listening
 
-        # Play audio
+        # Wait for the Arduino to print "Listening..." confirming capture started
+        # Then immediately play audio so it falls within the 1.5s capture window
+        listen_start = time.time()
+        while time.time() - listen_start < 5.0:
+            if ser.in_waiting:
+                line = ser.readline().decode("utf-8", errors="replace").strip()
+                if "Listening" in line:
+                    break
+
+        # Play audio — the Arduino is now actively capturing via PDM
         play_audio(str(file_path), volume=args.volume)
 
         # Wait for result
@@ -276,7 +284,7 @@ def main():
     print(f"    Total cycle:        {np.mean(total_times):.1f} +/- {np.std(total_times):.1f} ms")
 
     print(f"\n  Classification Report:")
-    print(metrics["report_str"])
+    print(metrics["classification_report_str"])
 
     # Generate confusion matrix
     from sklearn.metrics import confusion_matrix as sk_cm
