@@ -1,0 +1,12 @@
+{
+  "summary": {
+    "num_clips": 24,
+    "cosine_db_mean": 1.0,
+    "cosine_db_min": 1.0,
+    "cosine_norm_mean": 1.0,
+    "mae_db_mean": 0.016,
+    "mae_int8_mean": 0.04,
+    "int8_match_mean": 0.963,
+    "passed": true
+  }
+}

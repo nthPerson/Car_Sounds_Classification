@@ -221,9 +221,54 @@ The script configures which training condition each architecture uses (M2: Condi
 
 ---
 
+## Step 11: Deploy to Arduino (Phase 5)
+
+### 11a: Generate C headers
+
+Export the selected model and feature extraction assets as C headers:
+
+```bash
+python src/export_for_arduino.py --model m6 --tier 2 --method ptq
+```
+
+This generates 4 files in `arduino/car_sound_classifier/`: `model_data.h`, `mel_filterbank.h`, `normalization.h`, `hann_window.h`.
+
+To switch models, change `--model` to `m2` or `m5` (and `--method` to `qat` if desired).
+
+### 11b: Validate feature parity
+
+Before flashing, verify that the on-device feature extraction algorithm matches the Python training pipeline:
+
+```bash
+python src/validate_features.py
+```
+
+All clips should show cosine similarity >= 0.99 and int8 MAE <= 2.0.
+
+### 11c: Compile and flash
+
+1. Open `arduino/car_sound_classifier/car_sound_classifier.ino` in Arduino IDE
+2. Install **Arduino Mbed OS Nano Boards** via Boards Manager
+3. Install **Arduino_TensorFlowLite** via Library Manager
+4. Select Board: **Arduino Nano 33 BLE**
+5. Click Upload (Ctrl+U)
+6. Open Serial Monitor at **115200 baud** to see classification results
+
+### 11d: Run playback evaluation
+
+Systematic evaluation using the test set played through a speaker:
+
+```bash
+python src/playback_test.py --port /dev/ttyS3 --num-clips 208 --delay 3.0
+```
+
+Use `--port COM3` on Windows. Place the Arduino near the speaker. Results are saved to `results/playback_test_results.json`.
+
+---
+
 ## What's Next
 
-Phase 5 (Arduino deployment) and Phase 6 (on-device evaluation) will be added to this guide as they are completed. Check `docs/dev_log.md` for the latest progress.
+Phase 6 (on-device evaluation) and Phase 7 (final report) will be added as they are completed. Check `docs/dev_log.md` for the latest progress.
 
 ## Troubleshooting
 
@@ -243,3 +288,6 @@ Phase 5 (Arduino deployment) and Phase 6 (on-device evaluation) will be added to
 | Generate augmented data | `python src/generate_augmented_data.py` |
 | Train neural networks | `python src/train_nn.py` |
 | Quantize to int8 | `python src/quantize_nn.py` |
+| Export for Arduino | `python src/export_for_arduino.py --model m6 --tier 2 --method ptq` |
+| Validate features | `python src/validate_features.py` |
+| Run playback test | `python src/playback_test.py --port /dev/ttyS3` |

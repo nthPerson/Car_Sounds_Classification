@@ -4,6 +4,87 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-25 — Phase 5: Playback Test Complete
+
+**What was done:**
+- Ran the automated playback evaluation (`src/playback_test.py`) with all 208 test clips on two playback configurations
+- Fixed synchronization: modified Arduino sketch to use triggered mode (`READY`/`AUTO`/`STOP` commands) instead of continuous classification, and updated playback script to wait for "Listening..." before playing audio
+- Fixed `KeyError: 'report_str'` in playback script (correct key: `classification_report_str`)
+
+**Results — Speaker Hardware Ablation:**
+
+| Metric | Laptop Speakers | Bluetooth Speaker | PC Int8 |
+|--------|----------------|-------------------|---------|
+| Accuracy | 0.2500 | **0.6827** | 0.7837 |
+| F1 Macro | 0.1540 | **0.5465** | 0.7835 |
+| Degradation | -80.3% | **-30.3%** | — |
+
+- Laptop speakers failed catastrophically: 72% of predictions were startup classes due to missing bass response (speakers roll off below ~300 Hz, losing engine idle/braking low-frequency content)
+- Bluetooth speaker restored performance to 68.3% accuracy with 30.3% F1 degradation from PC evaluation
+- Braking Fault achieved PC-equivalent recall (81.8%) through Bluetooth speaker
+- Confidence well-calibrated: correct=0.81, incorrect=0.66
+
+**Key finding:** Audio reproduction quality is the dominant factor in playback test performance. In real deployment (mic near actual engine), there is no speaker in the signal path, so the Bluetooth results represent a conservative lower bound.
+
+**Status:** Phase 5 complete. All four evaluation dimensions now have data. Ready for Phase 6 (Evaluation & Reporting).
+
+---
+
+## 2026-03-25 — Phase 5: On-Device Testing and CMSIS-NN Optimization Investigation
+
+**What was done:**
+- Successfully compiled and uploaded the car sound classifier sketch to the Arduino Nano 33 BLE Sense Rev2
+- Measured actual resource usage: 319 KB flash (33%), 175 KB SRAM (68%), 64 KB tensor arena (63,556 bytes used)
+- Switched from `AllOpsResolver` to `MicroMutableOpResolver<5>` — saved 165 KB flash (484 KB → 319 KB)
+- Increased tensor arena from 50 KB to 64 KB after `AllocateTensors()` reported needing 59,456 bytes
+- Built TFLite Micro from source with CMSIS-NN optimized kernels for Cortex-M4 SIMD acceleration
+- Packaged as Arduino-compatible library (`TensorFlowLite_CMSIS_NN`), resolving include path conflicts, duplicate symbol issues, ACLE intrinsic compatibility, and `CMSIS_NN` preprocessor guards
+
+**Measured on-device performance:**
+- Audio capture: 1,490 ms (fixed, 1.5s @ 16 kHz)
+- Feature extraction: ~197 ms (CMSIS-DSP FFT mel-spectrogram)
+- Model inference: ~783 ms (M6 DS-CNN int8, 6M MACs, 8.4 cycles/MAC)
+- Total cycle: ~2,470 ms (one classification every 2.5 seconds)
+
+**CMSIS-NN SIMD investigation result:**
+- Built CMSIS-NN from tflite-micro source — compiled successfully on Arduino
+- Achieved only 5% speedup (828 ms → 783 ms) instead of expected 4.6x
+- Root cause: Arduino's bundled GCC 7.2.1 lacks ACLE intrinsic support for `__sxtb16`, `__smlabb`, `__smlatt` — CMSIS-NN selects SIMD code paths but compiler cannot emit SIMD instructions
+- Pre-compiled `.a` approach (GCC 14.3.1 with real SIMD) failed due to C++ ABI incompatibility
+- Conclusion: Full CMSIS-NN SIMD requires GCC 10+ (not available in Arduino Mbed OS board package v4.5.0)
+
+**Status:** Deployment complete and functional. Classifier runs continuously. Ready for playback test evaluation.
+
+---
+
+## 2026-03-24 — Phase 5: Arduino Deployment (Code Complete)
+
+**What was done:**
+- Created `src/export_for_arduino.py` — generates all C headers from Python (model bytes, sparse mel filterbank, normalization stats, Hann window). Extracts quantization params and TFLite ops from the model.
+- Created `src/validate_features.py` — feature parity validation comparing simulated on-device algorithm (manual FFT + sparse mel filterbank + global-max log + z-score) against librosa training pipeline
+- Created Arduino sketch in `arduino/car_sound_classifier/` (8 files):
+  - `car_sound_classifier.ino` — main sketch with PDM capture, feature extraction, TFLite Micro inference, Serial output
+  - `feature_extraction.cpp/.h` — CMSIS-DSP mel-spectrogram computation (5 phases: peak norm, frame FFT, mel energy, log conversion, z-score)
+  - `config.h` — all compile-time constants
+  - 4 generated headers: `model_data.h` (M6 PTQ, 21.3 KB), `mel_filterbank.h` (sparse, 490 weights), `normalization.h`, `hann_window.h`
+- Created `src/playback_test.py` — automated playback evaluation: plays test set audio through speaker, captures Arduino predictions over Serial, computes full evaluation metrics
+- Created `docs/deployment_results.md` — deployment documentation
+
+**Feature parity validation results (24 clips, all PASS):**
+- Cosine similarity: 1.0000 (perfect match between simulated on-device and librosa)
+- Int8 exact match rate: 96.3% (3.7% differ by rounding at quantization boundaries)
+- Mean absolute error (int8): 0.04 (acceptance threshold: <= 2.0)
+
+**Key design decisions:**
+- Sparse mel filterbank reduces flash from 40.2 KB to 2.1 KB (95.2% sparse)
+- `ref=np.max` log normalization makes pipeline scale-invariant, eliminating CMSIS-DSP vs numpy FFT scaling concerns
+- Machine-readable `RESULT|...` output format enables automated evaluation by `playback_test.py`
+- AllOpsResolver used for initial deployment (simplicity); switch to MicroMutableOpResolver for production
+
+**Status:** Code complete. Awaiting Arduino hardware for compilation, flashing, and playback test. Feature parity validated in Python — on-device accuracy should closely match PC int8 evaluation (F1=0.7835).
+
+---
+
 ## 2026-03-24 — Phase 4 Complete: Quantization (PTQ & QAT)
 
 **What was done:**
