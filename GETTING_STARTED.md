@@ -289,9 +289,29 @@ See also `docs/on_device_evaluation_report.md` for the complete Phase 6 synthesi
 
 ---
 
+## Step 13: Report Assembly (Phase 7)
+
+The report assembly documents in `docs/report/` collect all information, context, and references needed to write each section of the final research paper:
+
+```
+docs/report/
+  01_abstract.md              Key numbers and findings summary
+  02_introduction.md          Problem context, research questions
+  03_data_sources.md          Dataset, preprocessing, augmentation, noise bank
+  04_methodology.md           Models, training, quantization, deployment methods
+  05_analysis.md              Interpretation of experimental observations
+  06_results.md               Complete tables, figures, and quantitative data
+  07_discussion_and_industry.md   Discussion, applications, ethics
+  08_conclusion_and_future_work.md  Answers to research questions, limitations, future work
+```
+
+Each document contains bullet points, tables, file references, and figure paths — not polished prose. Use these as the basis for writing the final report.
+
+---
+
 ## What's Next
 
-Phases 0-6 are complete. Phase 7 (Final Report & Presentation) is the remaining work. Check `docs/dev_log.md` for the latest progress.
+All phases (0-7) are complete. The `docs/report/` directory contains the assembled material for writing the final research paper. Check `docs/project_spec/dev_log.md` for the full project history.
 
 ## Troubleshooting
 
