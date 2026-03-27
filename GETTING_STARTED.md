@@ -266,9 +266,32 @@ Use `--port COM3` on Windows. Place the Arduino near the speaker. Results are sa
 
 ---
 
+## Step 12: Review Comprehensive Evaluation (Phase 6)
+
+The evaluation notebook consolidates results from all project phases across all 4 evaluation dimensions (classification performance, quantization impact, on-device benchmarking, and end-to-end playback test).
+
+```bash
+jupyter notebook notebooks/07_evaluation.ipynb
+```
+
+This notebook loads all pre-computed results from `results/` and generates master comparison tables and publication-quality figures. No model training or hardware is required.
+
+**What it produces:**
+
+| Output | Location |
+|--------|----------|
+| Master accuracy comparison | Displayed in notebook |
+| Ablation study summary | Displayed in notebook |
+| Publication figures (9 total) | `results/paper_*.png` |
+| PC vs playback analysis | Displayed in notebook |
+
+See also `docs/on_device_evaluation_report.md` for the complete Phase 6 synthesis report.
+
+---
+
 ## What's Next
 
-Phase 6 (on-device evaluation) and Phase 7 (final report) will be added as they are completed. Check `docs/dev_log.md` for the latest progress.
+Phases 0-6 are complete. Phase 7 (Final Report & Presentation) is the remaining work. Check `docs/dev_log.md` for the latest progress.
 
 ## Troubleshooting
 
@@ -291,3 +314,4 @@ Phase 6 (on-device evaluation) and Phase 7 (final report) will be added as they 
 | Export for Arduino | `python src/export_for_arduino.py --model m6 --tier 2 --method ptq` |
 | Validate features | `python src/validate_features.py` |
 | Run playback test | `python src/playback_test.py --port /dev/ttyS3` |
+| Review evaluation | `jupyter notebook notebooks/07_evaluation.ipynb` |

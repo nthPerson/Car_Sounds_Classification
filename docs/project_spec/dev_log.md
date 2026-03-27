@@ -4,6 +4,27 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-03-26 — Phase 6 Complete: On-Device Evaluation
+
+**What was done:**
+- Created comprehensive evaluation notebook (`notebooks/07_evaluation.ipynb`) consolidating all 4 evaluation dimensions (D1-D4) with 9 publication-quality figures
+- Created on-device evaluation report (`docs/on_device_evaluation_report.md`) synthesizing all Phase 6 findings
+- Ran data verification pass: 18/18 checks passed across all result files
+- Updated `GETTING_STARTED.md` with Phase 6 evaluation section
+
+**Key results (M6 DS-CNN PTQ, Tier 2):**
+- PC Int8: F1 macro 0.7835, accuracy 78.4%
+- Bluetooth playback: F1 macro 0.5465, accuracy 68.3% (30.3% degradation)
+- Quantization: nearly lossless (all McNemar p > 0.05, PTQ sufficient)
+- On-device: 783 ms inference, 197 ms features, 2,470 ms total cycle
+- Memory: 319 KB flash (33%), 179 KB SRAM (68%)
+
+**Publication figures generated:** `results/paper_*.png` (9 figures covering master accuracy, ablation, quantization impact, accuracy vs size, latency breakdown, memory utilization, PC vs playback recall, speaker ablation, confidence calibration)
+
+**Status:** Phase 6 complete. All evaluation dimensions documented. Ready for Phase 7 (Final Report & Presentation).
+
+---
+
 ## 2026-03-25 — Phase 5: Playback Test Complete
 
 **What was done:**
