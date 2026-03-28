@@ -10,20 +10,20 @@ Tier 2 — the six-class, state-aware taxonomy — serves as the primary deploym
 
 | Rank | Model | Type | Training Condition | Accuracy | F1 Macro | F1 Weighted | Size (KB) |
 |------|-------|------|--------------------|----------|----------|-------------|-----------|
-| 1 | M6 DS-CNN PTQ | Int8 | B | 0.7837 | 0.7835 | 0.7835 | 21.3 |
+| 1 | M6 DS-CNN PTQ | Int8 | B | 0.8702 | 0.7835 | 0.8709 | 21.3 |
 | 2 | M6 DS-CNN QAT | Int8 | B | 0.8750 | 0.7774 | — | 22.3 |
 | 3 | M6 DS-CNN | Float32 | B | 0.8702 | 0.7767 | — | 246 |
 | 4 | M2 2D-CNN | Float32 | D | 0.8750 | 0.7512 | 0.8729 | 237 |
-| 5 | M2 2D-CNN QAT | Int8 | D | 0.8558 | 0.7426 | — | 20.5 |
-| 6 | M2 2D-CNN PTQ | Int8 | D | 0.8510 | 0.7413 | — | 20.1 |
+| 5 | M2 2D-CNN QAT | Int8 | D | 0.8702 | 0.7426 | — | 20.5 |
+| 6 | M2 2D-CNN PTQ | Int8 | D | 0.8654 | 0.7413 | — | 20.1 |
 | 7 | SVM | Classical | — | 0.8510 | 0.6992 | 0.8422 | — |
 | 8 | Random Forest | Classical | — | 0.8413 | 0.6794 | 0.8272 | — |
 | 9 | M5 1D-CNN | Float32 | B | 0.8029 | 0.6377 | — | 140 |
-| 10 | M5 1D-CNN PTQ | Int8 | B | 0.7837 | 0.6138 | — | 15.2 |
+| 10 | M5 1D-CNN PTQ | Int8 | B | 0.8125 | 0.6138 | — | 15.2 |
 
 <!-- Figure: results/paper_master_accuracy_tier2.png — Horizontal bar chart ranking all models by F1 macro -->
 
-The depthwise separable CNN (M6 DS-CNN) achieves the highest F1 macro across all model types and quantization methods. Its post-training quantized variant (PTQ, Int8) reaches an F1 macro of 0.7835, making it the top-ranked model overall and the selected candidate for on-device deployment. The M2 2D-CNN achieves a higher raw accuracy (0.8750 vs. 0.7837), but its lower F1 macro (0.7512) reveals a tendency to over-predict Idle Fault, the majority class (n = 118 of 208 test samples). This disparity between accuracy and F1 macro underscores why macro-averaged F1 is the more appropriate primary metric for this imbalanced dataset.
+The depthwise separable CNN (M6 DS-CNN) achieves the highest F1 macro across all model types and quantization methods. Its post-training quantized variant (PTQ, Int8) reaches an F1 macro of 0.7835, making it the top-ranked model overall and the selected candidate for on-device deployment. The M2 2D-CNN achieves a comparable raw accuracy (0.8750 vs. 0.8702), but its lower F1 macro (0.7512) reveals a tendency to over-predict Idle Fault, the majority class (n = 118 of 208 test samples). This disparity between accuracy and F1 macro underscores why macro-averaged F1 is the more appropriate primary metric for this imbalanced dataset.
 
 The classical ML baselines (SVM and Random Forest) are competitive on overall accuracy (0.8510 and 0.8413, respectively) but lag substantially behind the neural networks on F1 macro, indicating poorer performance on minority classes such as Normal Start-Up (n = 9) and Braking Fault (n = 11). The M5 1D-CNN, despite being the most compact architecture (15.2 KB quantized), ranks lowest among all models, suggesting that the MFCC feature representation discards spectral information important for distinguishing fault conditions at this granularity.
 
@@ -39,8 +39,8 @@ To contextualize the neural network results, Table 2 reports the classical ML ba
 | Random Forest | 1 | 0.8990 | 0.8724 | 0.8965 | 0.8899 |
 | SVM | 2 | 0.8510 | 0.6992 | 0.8422 | 0.7753 |
 | Random Forest | 2 | 0.8413 | 0.6794 | 0.8272 | 0.7246 |
-| SVM | 3 | 0.7552 | 0.7112 | 0.7463 | 0.7091 |
-| Random Forest | 3 | 0.7622 | 0.7021 | 0.7521 | 0.6880 |
+| SVM | 3 | 0.7552 | 0.7106 | 0.7494 | 0.7917 |
+| Random Forest | 3 | 0.7622 | 0.7019 | 0.7522 | 0.7778 |
 | Random Forest (top-50) | 2 | 0.8125 | 0.6724 | 0.8124 | — |
 
 Both models perform well on the binary Tier 1 task (SVM F1 macro = 0.9163), confirming that the dataset contains a strong normal-vs-anomaly signal in the hand-crafted feature space. Performance degrades substantially at Tier 2, where the gap between accuracy and F1 macro widens — a signature of class-imbalanced misclassification. Interestingly, at Tier 3 (nine classes), the SVM achieves a slightly higher F1 macro (0.7112) than at Tier 2 (0.6992), likely because the Tier 3 formulation excludes combined-fault samples that conflate multiple acoustic signatures into one class. A reduced Random Forest trained on the top-50 features by importance did not improve over the full 441-feature model at Tier 2 (F1 macro 0.6724 vs. 0.6794), suggesting that the feature space is not dominated by irrelevant dimensions.
@@ -71,19 +71,19 @@ All three neural network architectures were quantized to int8 using both post-tr
 
 | Model | Method | Float32 F1 | Int8 F1 | ΔF1 | Agreement | McNemar p | Size (KB) |
 |-------|--------|-----------|---------|-----|-----------|-----------|-----------|
-| M6 DS-CNN | PTQ | 0.7844 | 0.7835 | −0.0009 | 98.6% | > 0.05 | 21.3 |
-| M6 DS-CNN | QAT | 0.7723 | 0.7774 | +0.0051 | 95.2% | > 0.05 | 22.3 |
-| M2 2D-CNN | PTQ | 0.7388 | 0.7413 | +0.0025 | 99.0% | > 0.05 | 20.1 |
-| M2 2D-CNN | QAT | 0.7414 | 0.7426 | +0.0012 | 95.7% | > 0.05 | 20.5 |
-| M5 1D-CNN | PTQ | 0.6288 | 0.6138 | −0.0150 | 99.0% | > 0.05 | 15.2 |
-| M5 1D-CNN | QAT* | 0.6288 | 0.6138 | −0.0150 | 99.0% | > 0.05 | 15.2 |
+| M6 DS-CNN | PTQ | 0.7826 | 0.7835 | −0.0009 | 98.6% | > 0.05 | 21.3 |
+| M6 DS-CNN | QAT | 0.7826 | 0.7774 | +0.0051 | 95.2% | > 0.05 | 22.3 |
+| M2 2D-CNN | PTQ | 0.7438 | 0.7413 | +0.0025 | 99.0% | > 0.05 | 20.1 |
+| M2 2D-CNN | QAT | 0.7438 | 0.7426 | +0.0012 | 95.7% | > 0.05 | 20.5 |
+| M5 1D-CNN | PTQ | 0.5987 | 0.6138 | −0.0150 | 99.0% | > 0.05 | 15.2 |
+| M5 1D-CNN | QAT* | 0.5987 | 0.6138 | −0.0150 | 99.0% | > 0.05 | 15.2 |
 
 *M5 QAT is identical to M5 PTQ because the TensorFlow Model Optimization Toolkit (tfmot) does not support quantization-aware training for Conv1D layers, so QAT could not be applied to M5.
 
 <!-- Figure: results/paper_quantization_impact.png — Horizontal bar chart of delta F1 by model and method -->
 <!-- Figure: results/paper_accuracy_vs_size.png — Scatter plot of F1 vs. model size for all int8 models -->
 
-The central finding is that int8 quantization is effectively lossless for these small audio classification models. No model–method combination exhibits a statistically significant accuracy change (all McNemar p > 0.05), and prediction agreement rates range from 95.2% to 99.0%. The largest observed F1 degradation is 0.0150 (M5 PTQ), while M2 and M6 QAT variants actually show marginal F1 improvements after quantization — a phenomenon attributable to the regularization effect of reduced numerical precision in small networks. Int8 model sizes range from 15.2 KB to 22.3 KB, representing a 6–16× compression from their float32 counterparts, and all fit comfortably within the 150 KB flash budget of the Arduino Nano 33 BLE Sense Rev2.
+The central finding is that int8 quantization is effectively lossless for these small audio classification models. No model–method combination exhibits a statistically significant accuracy change (all McNemar p > 0.05), and prediction agreement rates range from 95.2% to 99.0%. No model shows substantial F1 degradation; the largest observed decrease is 0.0051 (M6 QAT). M5 PTQ actually shows a marginal F1 improvement of 0.015 (int8 exceeds float32) — a phenomenon attributable to the regularization effect of reduced numerical precision in small networks. Int8 model sizes range from 15.2 KB to 22.3 KB, representing a 6–16× compression from their float32 counterparts, and all fit comfortably within the 150 KB flash budget of the Arduino Nano 33 BLE Sense Rev2.
 
 These results indicate that PTQ is sufficient for deployment — QAT provides no measurable benefit over PTQ for any architecture, likely because the small model sizes (6,246–14,566 parameters) and batch normalization folding leave minimal quantization error even without retraining.
 
@@ -95,12 +95,12 @@ The selected deployment model (M6 DS-CNN PTQ, Tier 2) was deployed on the Arduin
 
 | Resource | Used | Budget | Utilization |
 |----------|------|--------|-------------|
-| Flash | 319 KB | 983 KB | 32.5% |
-| SRAM (static) | 179 KB | 256 KB | 69.9% |
+| Flash | 319 KB | 983 KB | 33% |
+| SRAM (static) | 175 KB | 256 KB | 68% |
 | Tensor arena | 63,556 B | 65,536 B allocated (80 KB budget) | 97.0% of allocated; 77.5% of budget |
-| SRAM remaining | 83 KB | — | Available for stack/heap |
+| SRAM remaining | 81 KB | — | Available for stack/heap |
 
-The model consumes only 32.5% of available flash, leaving substantial room for application logic, BLE stack, and potential multi-model deployment. SRAM utilization is tighter: the tensor arena occupies 63.6 KB of the 80 KB budget (77.5%), and total static SRAM usage reaches 69.9% of the 256 KB available. The remaining 83 KB of SRAM provides adequate headroom for stack and heap operations during inference.
+The model consumes only 33% of available flash, leaving substantial room for application logic, BLE stack, and potential multi-model deployment. SRAM utilization is tighter: the tensor arena occupies 63.6 KB of the 80 KB budget (77.5%), and total static SRAM usage reaches 68% of the 256 KB available. The remaining 81 KB of SRAM provides adequate headroom for stack and heap operations during inference.
 
 **Table 6.** Inference latency breakdown for M6 DS-CNN PTQ on the Arduino Nano 33 BLE Sense Rev2.
 
@@ -108,13 +108,13 @@ The model consumes only 32.5% of available flash, leaving substantial room for a
 |-------|-----------|----------|-------|
 | Audio capture | 1,490 | — | 60.3% |
 | Feature extraction | 197.4 | 0.2 | 8.0% |
-| Model inference | 784.9 | 0.2 | 31.7% |
-| **Total cycle** | **2,472.5** | **0.4** | **100%** |
+| Model inference | 784.9 | 0.1 | 31.7% |
+| **Total cycle** | **2,472.5** | **0.7** | **100%** |
 
 <!-- Figure: results/paper_latency_breakdown.png — Stacked bar and pie chart of latency phases -->
 <!-- Figure: results/paper_memory_utilization.png — Flash and SRAM usage vs. budget -->
 
-A complete classification cycle takes approximately 2.5 seconds, dominated by the 1.49-second audio capture window (1.5 seconds of audio at 16 kHz). Model inference requires 784.9 ms, yielding 8.4 cycles per multiply-accumulate (MAC) operation over the model's 6,005,952 MACs per inference. This is below the theoretical reference of approximately 10 cycles/MAC for generic int8 operations on Cortex-M4 but above the approximately 3 cycles/MAC achievable with fully optimized CMSIS-NN SIMD kernels. The gap is attributable to the older GCC 7.2.1 toolchain bundled with the Arduino Mbed OS board package, which does not fully exploit the Cortex-M4's SIMD capabilities. Upgrading to GCC 12+ via PlatformIO or the nRF Connect SDK could reduce inference latency to approximately 260 ms, bringing the total cycle time below 2 seconds. Nevertheless, for the target use case — a handheld diagnostic tool held near the engine for several seconds — a 2.5-second cycle is operationally acceptable.
+A complete classification cycle takes approximately 2.5 seconds, dominated by the 1.49-second audio capture window (1.5 seconds of audio at 16 kHz). Model inference requires 784.9 ms, yielding 8.4 cycles per multiply-accumulate (MAC) operation over the model's 6,005,952 MACs per inference. This is below the theoretical reference of approximately 10 cycles/MAC for generic int8 operations on Cortex-M4 but above the approximately 3 cycles/MAC achievable with fully optimized CMSIS-NN SIMD kernels. The gap is attributable to the older GCC 7.2.1 toolchain bundled with the Arduino Mbed OS board package, which does not fully exploit the Cortex-M4's SIMD capabilities. Upgrading to GCC 12+ via PlatformIO or the nRF Connect SDK could reduce inference latency to approximately 282 ms, bringing the total cycle time below 2 seconds. Nevertheless, for the target use case — a handheld diagnostic tool held near the engine for several seconds — a 2.5-second cycle is operationally acceptable.
 
 ## 5.6 End-to-End Playback Evaluation
 

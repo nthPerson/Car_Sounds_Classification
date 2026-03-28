@@ -18,7 +18,7 @@ Three convolutional neural network architectures were designed for deployment on
 
 ### 3.2.1 M2 — Compact 2-D CNN (14,566 parameters)
 
-The primary architecture is a three-block 2-D CNN operating on log-mel spectrograms of shape (40, 92, 1). Each block consists of a Conv2D layer with 3×3 kernels and same padding, followed by batch normalization, ReLU activation, and 2×2 max pooling. The three convolutional layers use 16, 32, and 32 filters respectively. The final block feeds into global average pooling, a dropout layer (rate = 0.3, determined by hyperparameter search), and a dense softmax output layer. This architecture was chosen as the primary candidate for its proven effectiveness in audio classification tasks while remaining compact enough for microcontroller deployment.
+The primary architecture is a three-block 2-D CNN operating on log-mel spectrograms of shape (40, 92, 1). Each block consists of a Conv2D layer with 3×3 kernels and same padding, followed by batch normalization, ReLU activation, and 2×2 max pooling; the third block omits max pooling and feeds directly into global average pooling. The three convolutional layers use 16, 32, and 32 filters respectively. Global average pooling is followed by a dropout layer (rate = 0.3, determined by hyperparameter search), and a dense softmax output layer. This architecture was chosen as the primary candidate for its proven effectiveness in audio classification tasks while remaining compact enough for microcontroller deployment.
 
 ### 3.2.2 M5 — 1-D CNN on MFCCs (6,246 parameters)
 
@@ -34,7 +34,7 @@ All neural networks shared a common training configuration. The Adam optimizer w
 
 ### 3.2.5 Hyperparameter Search
 
-Hyperparameters were tuned on Tier 2 (the primary deployment target) and then applied to Tiers 1 and 3 without tier-specific optimization. For each architecture, a structured grid search was conducted sequentially over learning rate ({0.0005, 0.001, 0.002}) and dropout rate ({0.2, 0.3, 0.5}), selecting configurations by best validation accuracy. The optimal settings were: M2 at learning rate 0.002 with dropout 0.3 and aggressive SpecAugment; M5 at learning rate 0.002 with dropout 0.2 and no SpecAugment; and M6 at learning rate 0.0005 with no dropout sweep (fixed architecture) and default SpecAugment. Notably, M6 exhibited training instability on the original imbalanced dataset (validation accuracy collapsed to approximately 23% at learning rates ≥ 0.001), but trained stably after data augmentation and class balancing were applied.
+Hyperparameters were tuned on Tier 2 (the primary deployment target) and then applied to Tiers 1 and 3 without tier-specific optimization. For each architecture, a structured grid search was conducted sequentially over learning rate ({0.0005, 0.001, 0.002}) and dropout rate ({0.2, 0.3, 0.5}), selecting configurations by best validation accuracy. The optimal settings were: M2 at learning rate 0.002 with dropout 0.2 and no augmentation; M5 at learning rate 0.001 with dropout 0.3 and default augmentation; and M6 at learning rate 0.002 with no dropout sweep (fixed architecture) and no augmentation. Notably, M6 exhibited training instability on the original imbalanced dataset (validation accuracy collapsed to approximately 23% at learning rates ≥ 0.001), but trained stably after data augmentation and class balancing were applied.
 
 ## 3.3 Data Augmentation Strategy
 
