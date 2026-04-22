@@ -124,7 +124,7 @@ A speaker hardware ablation study was conducted using two playback configuration
 
 *[Figure placeholder: `results/paper_quantization_impact_tier2.png` — Float32 vs. int8 F1 delta and agreement rates]*
 
-*[Figure placeholder: `results/paper_accuracy_vs_size_tier2.png` — Accuracy–size trade-off across all model variants]*
+*[Figure placeholder: `results/paper_f1_macro_vs_size_tier2.png` — Accuracy–size trade-off across all model variants]*
 
 *[Figure placeholder: `results/paper_latency_breakdown.png` — On-device latency breakdown by pipeline phase]*
 

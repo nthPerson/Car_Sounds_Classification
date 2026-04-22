@@ -252,7 +252,7 @@ The Arduino Mbed OS board package bundles GCC 7.2.1 (2017), which prevents CMSIS
 | `results/paper_master_accuracy_tier2.png` | All models ranked by Tier 2 F1 macro |
 | `results/paper_ablation_tier2.png` | Augmentation ablation (B/C/D x 3 architectures) |
 | `results/paper_quantization_impact.png` | Delta F1 by model and method |
-| `results/paper_accuracy_vs_size.png` | F1 vs model size scatter (int8 models) |
+| `results/paper_f1_macro_vs_size.png` | F1 vs model size scatter (int8 models) |
 | `results/paper_latency_breakdown.png` | Audio capture / features / inference timing |
 | `results/paper_memory_utilization.png` | Flash and SRAM usage vs budget |
 | `results/paper_pc_vs_playback_recall.png` | Per-class recall: PC vs Bluetooth vs laptop |

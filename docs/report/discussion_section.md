@@ -64,7 +64,7 @@ The M6 DS-CNN architecture emerged as the optimal choice for microcontroller dep
 
 The choice of depthwise separable convolutions is also well-aligned with the hardware acceleration ecosystem. The CMSIS-NN library (Lai et al., 2018) provides optimized kernels specifically targeting depthwise separable operations on Cortex-M processors, and these operations benefit disproportionately from SIMD acceleration when the toolchain supports it. The four-block DS-CNN architecture used in this study mirrors the design proposed by Zhang et al. (2017) for keyword spotting on Cortex-M7, validating the architectural pattern for audio classification tasks on Cortex-M4.
 
-*[See Figure [X]: F1 macro versus int8 model size for all quantized models — `results/paper_accuracy_vs_size.png`]*
+*[See Figure [X]: F1 macro versus int8 model size for all quantized models — `results/paper_f1_macro_vs_size.png`]*
 
 ## 7.2 Comparison with Related Work
 

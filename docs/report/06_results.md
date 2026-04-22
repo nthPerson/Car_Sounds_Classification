@@ -4,16 +4,16 @@
 
 | Rank | Model | Type | Condition | Accuracy | F1 Macro | F1 Weighted | Size (KB) |
 |------|-------|------|-----------|----------|----------|-------------|-----------|
-| 1 | **M6 DS-CNN PTQ** | **Int8** | **B** | **0.7837** | **0.7835** | **0.7835** | **21.3** |
-| 2 | M6 DS-CNN QAT | Int8 | B | 0.8750 | 0.7774 | — | 22.3 |
-| 3 | M6 DS-CNN | Float32 | B | 0.8702 | 0.7767 | — | 246 |
+| 1 | **M6 DS-CNN PTQ** | **Int8** | **B** | **0.8702** | **0.7835** | **0.8709** | **21.3** |
+| 2 | M6 DS-CNN QAT | Int8 | B | 0.8750 | 0.7774 | 0.8720 | 22.3 |
+| 3 | M6 DS-CNN | Float32 | B | 0.8702 | 0.7767 | 0.8660 | 246 |
 | 4 | M2 2D-CNN | Float32 | D | 0.8750 | 0.7512 | 0.8729 | 237 |
-| 5 | M2 2D-CNN QAT | Int8 | D | 0.8558 | 0.7426 | — | 20.5 |
-| 6 | M2 2D-CNN PTQ | Int8 | D | 0.8510 | 0.7413 | — | 20.1 |
-| 7 | M1 SVM | Classical | — | 0.8510 | 0.6992 | 0.8422 | — |
-| 8 | M1 RF | Classical | — | 0.8413 | 0.6794 | 0.8272 | — |
-| 9 | M5 1D-CNN | Float32 | B | 0.8029 | 0.6377 | — | 140 |
-| 10 | M5 1D-CNN PTQ | Int8 | B | 0.7837 | 0.6138 | — | 15.2 |
+| 5 | M2 2D-CNN QAT | Int8 | D | 0.8702 | 0.7426 | 0.8688 | 20.5 |
+| 6 | M2 2D-CNN PTQ | Int8 | D | 0.8510 | 0.7413 | 0.8624 | 20.1 |
+| 7 | M1 SVM | Classical | A | 0.8510 | 0.6992 | 0.8422 | — |
+| 8 | M1 RF | Classical | A | 0.8413 | 0.6794 | 0.8272 | — |
+| 9 | M5 1D-CNN | Float32 | B | 0.8029 | 0.6377 | 0.8100 | 140 |
+| 10 | M5 1D-CNN PTQ | Int8 | B | 0.8125 | 0.6138 | 0.8115 | 15.2 |
 
 **Note:** M2 has higher accuracy than M6 but lower F1 macro due to class imbalance — M2 tends to over-predict the majority class (Idle Fault).
 
@@ -47,19 +47,19 @@
 
 ## 6.4 Quantization Results (All Tier 2 Models)
 
-| Model | Method | Float32 F1 | Int8 F1 | Delta F1 | Agreement | McNemar p | Size (KB) |
-|-------|--------|-----------|---------|----------|-----------|-----------|-----------|
-| M2 | PTQ | 0.7388 | 0.7413 | +0.0025 | 99.0% | > 0.05 | 20.1 |
-| M2 | QAT | 0.7414 | 0.7426 | +0.0012 | 95.7% | > 0.05 | 20.5 |
-| M5 | PTQ | 0.6288 | 0.6138 | -0.0150 | 99.0% | > 0.05 | 15.2 |
-| M5 | QAT* | 0.6288 | 0.6138 | -0.0150 | 99.0% | > 0.05 | 15.2 |
-| M6 | PTQ | 0.7844 | 0.7835 | -0.0009 | 98.6% | > 0.05 | 21.3 |
-| M6 | QAT | 0.7723 | 0.7774 | +0.0051 | 95.2% | > 0.05 | 22.3 |
+| Model | Method | Float32 F1 | Int8 F1 | Delta F1 (F32−Int8) | Agreement | McNemar p | Size (KB) |
+|-------|--------|-----------|---------|---------------------|-----------|-----------|-----------|
+| M2 | PTQ | 0.7438 | 0.7413 | +0.0025 | 99.0% | > 0.05 | 20.1 |
+| M2 | QAT | 0.7438 | 0.7426 | +0.0012 | 95.7% | > 0.05 | 20.5 |
+| M5 | PTQ | 0.5987 | 0.6138 | -0.0150 | 99.0% | > 0.05 | 15.2 |
+| M5 | QAT* | 0.5987 | 0.6138 | -0.0150 | 99.0% | > 0.05 | 15.2 |
+| M6 | PTQ | 0.7826 | 0.7835 | -0.0009 | 98.6% | > 0.05 | 21.3 |
+| M6 | QAT | 0.7826 | 0.7774 | +0.0051 | 95.2% | > 0.05 | 22.3 |
 
 *M5 QAT = M5 PTQ (tfmot does not support Conv1D, so QAT row is identical to PTQ)
 
 **Source:** `results/quantization_summary.csv`, `results/quantization_results.json`
-**Figure:** `results/paper_quantization_impact.png`, `results/paper_accuracy_vs_size.png`
+**Figure:** `results/paper_quantization_impact.png`, `results/paper_f1_macro_vs_size.png`
 
 ## 6.5 On-Device Performance (M6 DS-CNN PTQ)
 
@@ -67,10 +67,10 @@
 
 | Resource | Used | Allocated / Budget | Utilization |
 |----------|------|-------------------|-------------|
-| Flash | 319 KB | 983 KB (budget) | 32.5% |
-| SRAM (static) | 179 KB | 256 KB (budget) | 69.9% |
+| Flash | 319 KB | 983 KB (budget) | 33% |
+| SRAM (static) | 175 KB | 256 KB (budget) | 68% |
 | Tensor arena | 63,556 B | 65,536 B (allocated) | 97.0% of allocated; 77.5% of 80 KB budget |
-| SRAM remaining | 83 KB | — | For stack/heap |
+| SRAM remaining | 81 KB | — | For stack/heap |
 
 ### Latency
 
@@ -78,8 +78,8 @@
 |-------|-----------|----------|-------|
 | Audio capture | 1,490 | — | 60.3% |
 | Feature extraction | 197.4 | 0.2 | 8.0% |
-| Model inference | 784.9 | 0.2 | 31.7% |
-| **Total cycle** | **2,472.5** | **0.4** | **100%** |
+| Model inference | 784.9 | 0.1 | 31.7% |
+| **Total cycle** | **2,472.5** | **0.7** | **100%** |
 
 ### Computational Efficiency
 
@@ -100,9 +100,9 @@
 
 | Metric | PC Int8 | Bluetooth Speaker | Laptop Speakers |
 |--------|---------|-------------------|-----------------|
-| Accuracy | 0.7837 | 0.6827 | 0.2500 |
+| Accuracy | 0.8702 | 0.6827 | 0.2500 |
 | F1 Macro | 0.7835 | 0.5465 | 0.1540 |
-| F1 Weighted | 0.7835 | 0.7162 | 0.2825 |
+| F1 Weighted | 0.8709 | 0.7162 | 0.2825 |
 | Degradation (F1) | — | -30.3% | -80.3% |
 
 ### Per-Class Recall (Bluetooth Speaker vs PC)
@@ -145,7 +145,7 @@
 | Master accuracy (Tier 2) | `results/paper_master_accuracy_tier2.png` | All models ranked by F1 macro, horizontal bar chart |
 | Ablation (Tier 2) | `results/paper_ablation_tier2.png` | Conditions B/C/D x 3 architectures, grouped bar |
 | Quantization impact | `results/paper_quantization_impact.png` | Delta F1 by model/method, horizontal bar |
-| Accuracy vs size | `results/paper_accuracy_vs_size.png` | F1 vs model size scatter, all int8 Tier 2 |
+| F1 macro vs size | `results/paper_f1_macro_vs_size.png` | F1 vs model size scatter, all int8 Tier 2 |
 | Latency breakdown | `results/paper_latency_breakdown.png` | Stacked bar + pie chart |
 | Memory utilization | `results/paper_memory_utilization.png` | Flash/SRAM usage vs budget |
 | PC vs playback recall | `results/paper_pc_vs_playback_recall.png` | Per-class recall, 3 bars (PC/BT/laptop) |

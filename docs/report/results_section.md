@@ -11,15 +11,15 @@ Tier 2 — the six-class, state-aware taxonomy — serves as the primary deploym
 | Rank | Model | Type | Training Condition | Accuracy | F1 Macro | F1 Weighted | Size (KB) |
 |------|-------|------|--------------------|----------|----------|-------------|-----------|
 | 1 | M6 DS-CNN PTQ | Int8 | B | 0.8702 | 0.7835 | 0.8709 | 21.3 |
-| 2 | M6 DS-CNN QAT | Int8 | B | 0.8750 | 0.7774 | — | 22.3 |
-| 3 | M6 DS-CNN | Float32 | B | 0.8702 | 0.7767 | — | 246 |
+| 2 | M6 DS-CNN QAT | Int8 | B | 0.8750 | 0.7774 | 0.8720 | 22.3 |
+| 3 | M6 DS-CNN | Float32 | B | 0.8702 | 0.7767 | 0.8660 | 246 |
 | 4 | M2 2D-CNN | Float32 | D | 0.8750 | 0.7512 | 0.8729 | 237 |
-| 5 | M2 2D-CNN QAT | Int8 | D | 0.8702 | 0.7426 | — | 20.5 |
-| 6 | M2 2D-CNN PTQ | Int8 | D | 0.8654 | 0.7413 | — | 20.1 |
-| 7 | SVM | Classical | — | 0.8510 | 0.6992 | 0.8422 | — |
-| 8 | Random Forest | Classical | — | 0.8413 | 0.6794 | 0.8272 | — |
-| 9 | M5 1D-CNN | Float32 | B | 0.8029 | 0.6377 | — | 140 |
-| 10 | M5 1D-CNN PTQ | Int8 | B | 0.8125 | 0.6138 | — | 15.2 |
+| 5 | M2 2D-CNN QAT | Int8 | D | 0.8702 | 0.7426 | 0.8688 | 20.5 |
+| 6 | M2 2D-CNN PTQ | Int8 | D | 0.8654 | 0.7413 | 0.8624 | 20.1 |
+| 7 | SVM | Classical | A | 0.8510 | 0.6992 | 0.8422 | — |
+| 8 | Random Forest | Classical | A | 0.8413 | 0.6794 | 0.8272 | — |
+| 9 | M5 1D-CNN | Float32 | B | 0.8029 | 0.6377 | 0.8100 | 140 |
+| 10 | M5 1D-CNN PTQ | Int8 | B | 0.8125 | 0.6138 | 0.8115 | 15.2 |
 
 <!-- Figure: results/paper_master_accuracy_tier2.png — Horizontal bar chart ranking all models by F1 macro -->
 
@@ -81,7 +81,7 @@ All three neural network architectures were quantized to int8 using both post-tr
 *M5 QAT is identical to M5 PTQ because the TensorFlow Model Optimization Toolkit (tfmot) does not support quantization-aware training for Conv1D layers, so QAT could not be applied to M5.
 
 <!-- Figure: results/paper_quantization_impact.png — Horizontal bar chart of delta F1 by model and method -->
-<!-- Figure: results/paper_accuracy_vs_size.png — Scatter plot of F1 vs. model size for all int8 models -->
+<!-- Figure: results/paper_f1_macro_vs_size.png — Scatter plot of F1 vs. model size for all int8 models -->
 
 The central finding is that int8 quantization is effectively lossless for these small audio classification models. No model–method combination exhibits a statistically significant accuracy change (all McNemar p > 0.05), and prediction agreement rates range from 95.2% to 99.0%. No model shows substantial F1 degradation; the largest observed decrease is 0.0051 (M6 QAT). M5 PTQ actually shows a marginal F1 improvement of 0.015 (int8 exceeds float32) — a phenomenon attributable to the regularization effect of reduced numerical precision in small networks. Int8 model sizes range from 15.2 KB to 22.3 KB, representing a 6–16× compression from their float32 counterparts, and all fit comfortably within the 150 KB flash budget of the Arduino Nano 33 BLE Sense Rev2.
 
@@ -124,9 +124,9 @@ The end-to-end system evaluation (D4) assessed real-world inference by playing t
 
 | Metric | PC Int8 (Baseline) | Bluetooth Speaker | Laptop Speakers |
 |--------|---------------------|-------------------|-----------------|
-| Accuracy | 0.7837 | 0.6827 | 0.2500 |
+| Accuracy | 0.8702 | 0.6827 | 0.2500 |
 | F1 Macro | 0.7835 | 0.5465 | 0.1540 |
-| F1 Weighted | 0.7835 | 0.7162 | 0.2825 |
+| F1 Weighted | 0.8709 | 0.7162 | 0.2825 |
 | Degradation (F1 Macro) | — | −30.3% | −80.3% |
 
 <!-- Figure: results/paper_speaker_ablation.png — Prediction distributions by speaker type -->
