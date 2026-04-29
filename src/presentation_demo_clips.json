@@ -1,0 +1,154 @@
+[
+  {
+    "path": "braking state/normal_brakes/normal_brakes_43.wav",
+    "true_label": 0,
+    "note": "Normal braking — strongest confidence case"
+  },
+  {
+    "path": "braking state/worn_out_brakes/worn_out_brakes_52.wav",
+    "true_label": 1,
+    "note": "Worn brakes — very high confidence"
+  },
+  {
+    "path": "idle state/normal_engine_idle/normal_engine_idle_92.wav",
+    "true_label": 2,
+    "note": "Normal idle — clean engine sound"
+  },
+  {
+    "path": "idle state/low_oil/low_oil_9.wav",
+    "true_label": 3,
+    "note": "Low oil — idle fault (high confidence)"
+  },
+  {
+    "path": "startup state/normal_engine_startup/normal_engine_startup_6.wav",
+    "true_label": 4,
+    "note": "Normal start-up"
+  },
+  {
+    "path": "startup state/bad_ignition/bad_ignition_61.wav",
+    "true_label": 5,
+    "note": "Bad ignition — startup fault"
+  },
+  {
+    "path": "startup state/bad_ignition/bad_ignition_54.wav",
+    "true_label": 5,
+    "note": "Bad ignition (confidently wrong — pivot to speaker ablation)"
+  },
+  {
+    "path": "idle state/normal_engine_idle/normal_engine_idle_2.wav",
+    "true_label": 2,
+    "note": "Normal idle (confidently wrong as Braking Fault)"
+  },
+  {
+    "path": "braking state/normal_brakes/normal_brakes_41.wav",
+    "true_label": 0,
+    "note": "Normal braking (low-frequency cues lost through speaker)"
+  },
+  {
+    "path": "idle state/serpentine_belt/serpentine_belt_41.wav",
+    "true_label": 3,
+    "note": "Serpentine belt (hard case — low confidence)"
+  },
+
+  {
+    "path": "braking state/normal_brakes/normal_brakes_28.wav",
+    "true_label": 0,
+    "note": "Normal braking — another correct case"
+  },
+  {
+    "path": "braking state/normal_brakes/normal_brakes_51.wav",
+    "true_label": 0,
+    "note": "Normal braking — correct, moderate confidence"
+  },
+  {
+    "path": "braking state/worn_out_brakes/worn_out_brakes_1.wav",
+    "true_label": 1,
+    "note": "Worn brakes — very high confidence"
+  },
+  {
+    "path": "braking state/worn_out_brakes/worn_out_brakes_47.wav",
+    "true_label": 1,
+    "note": "Worn brakes — high confidence"
+  },
+  {
+    "path": "idle state/normal_engine_idle/normal_engine_idle_175.wav",
+    "true_label": 2,
+    "note": "Normal idle — correct"
+  },
+  {
+    "path": "idle state/normal_engine_idle/normal_engine_idle_108.wav",
+    "true_label": 2,
+    "note": "Normal idle — correct"
+  },
+  {
+    "path": "idle state/low_oil/low_oil_87.wav",
+    "true_label": 3,
+    "note": "Low oil — very high confidence"
+  },
+  {
+    "path": "idle state/low_oil/low_oil_29.wav",
+    "true_label": 3,
+    "note": "Low oil — very high confidence"
+  },
+  {
+    "path": "idle state/combined/no oil_serpentine belt/mix_72.wav",
+    "true_label": 3,
+    "note": "Combined fault (low oil + serpentine) — idle fault"
+  },
+  {
+    "path": "idle state/combined/no oil_serpentine belt/mix_34.wav",
+    "true_label": 3,
+    "note": "Combined fault — idle fault"
+  },
+  {
+    "path": "startup state/normal_engine_startup/normal_engine_startup_3.wav",
+    "true_label": 4,
+    "note": "Normal start-up — correct, moderate confidence"
+  },
+  {
+    "path": "startup state/normal_engine_startup/normal_engine_startup_19.wav",
+    "true_label": 4,
+    "note": "Normal start-up — correct"
+  },
+  {
+    "path": "startup state/dead_battery/dead_battery_39.wav",
+    "true_label": 5,
+    "note": "Dead battery — startup fault, high confidence"
+  },
+  {
+    "path": "startup state/bad_ignition/bad_ignition_59.wav",
+    "true_label": 5,
+    "note": "Bad ignition — correct"
+  },
+  {
+    "path": "startup state/dead_battery/dead_battery_13.wav",
+    "true_label": 5,
+    "note": "Dead battery — correct"
+  },
+
+  {
+    "path": "idle state/normal_engine_idle/normal_engine_idle_237.wav",
+    "true_label": 2,
+    "note": "Normal idle (confidently wrong as Braking Fault — speaker artifact)"
+  },
+  {
+    "path": "startup state/dead_battery/dead_battery_12.wav",
+    "true_label": 5,
+    "note": "Dead battery (confidently wrong as Idle Fault)"
+  },
+  {
+    "path": "braking state/normal_brakes/normal_brakes_23.wav",
+    "true_label": 0,
+    "note": "Normal braking (wrong — lower-freq cues lost)"
+  },
+  {
+    "path": "idle state/combined/no oil_serpentine belt/mix_23.wav",
+    "true_label": 3,
+    "note": "Combined fault (wrong — predicted as Normal Start-Up)"
+  },
+  {
+    "path": "idle state/serpentine_belt/serpentine_belt_60.wav",
+    "true_label": 3,
+    "note": "Serpentine belt (wrong — predicted as Braking Fault)"
+  }
+]
