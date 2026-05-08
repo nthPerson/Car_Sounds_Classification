@@ -18,7 +18,11 @@
  *
  * Serial Commands:
  *   "READY" — Trigger one capture-classify cycle (used by playback_test.py)
- *   Clips are also classified continuously in a loop.
+ *   "DUMP"  — Trigger one capture-classify cycle AND stream the raw
+ *             log-mel spectrogram (40×92 floats, dB) over Serial. Used by
+ *             src/compare_mel_spectrograms.py.
+ *   "AUTO"  — Continuous classification.
+ *   "STOP"  — Stop continuous classification.
  */
 
 #include <PDM.h>
@@ -106,9 +110,37 @@ bool captureClip() {
     return true;
 }
 
+// ─── Mel-spectrogram dump (for compare_mel_spectrograms.py) ─────────────
+//
+// Streams the 40×92 log-mel spectrogram as text. Format:
+//   MELDUMP_START|<n_mels>|<n_frames>
+//   <row_0: n_frames floats, comma-separated>
+//   ...
+//   <row_(n_mels-1): n_frames floats, comma-separated>
+//   MELDUMP_END
+//
+// Values are in dB (post librosa-style power_to_db, ref=np.max, top_db=80),
+// matching the output of `compute_mel_spectrogram` BEFORE z-score
+// normalization. This makes them directly comparable to a librosa
+// spectrogram computed in Python.
+void dumpMelSpectrogram(const float* mel) {
+    Serial.print("MELDUMP_START|");
+    Serial.print(N_MELS);
+    Serial.print("|");
+    Serial.println(N_FRAMES);
+    for (int b = 0; b < N_MELS; b++) {
+        for (int f = 0; f < N_FRAMES; f++) {
+            Serial.print(mel[b * N_FRAMES + f], 3);
+            if (f < N_FRAMES - 1) Serial.print(",");
+        }
+        Serial.println();
+    }
+    Serial.println("MELDUMP_END");
+}
+
 // ─── Inference ──────────────────────────────────────────────────────────
 
-void runInference() {
+void runInference(bool dumpMel) {
     unsigned long t_total_start = micros();
 
     // 1. Capture audio
@@ -123,6 +155,9 @@ void runInference() {
     // 2. Feature extraction
     unsigned long t_feat_start = micros();
     compute_mel_spectrogram(audioBuffer, AUDIO_SAMPLES, melSpectrogram);
+    if (dumpMel) {
+        dumpMelSpectrogram(melSpectrogram);
+    }
     normalize_spectrogram(melSpectrogram);
     quantize_input(melSpectrogram, modelInput, inputScale, inputZeroPoint);
     float featMs = (micros() - t_feat_start) / 1000.0f;
@@ -306,6 +341,7 @@ void setup() {
     Serial.println();
     Serial.println("Commands:");
     Serial.println("  READY    — Trigger one capture-classify cycle");
+    Serial.println("  DUMP     — Trigger one cycle and stream the mel spectrogram");
     Serial.println("  AUTO     — Start continuous classification");
     Serial.println("  STOP     — Stop continuous classification");
     Serial.println();
@@ -326,7 +362,10 @@ void loop() {
             if (serialPos > 0) {
                 if (strncmp(serialBuffer, "READY", 5) == 0) {
                     // Triggered mode: run one inference
-                    runInference();
+                    runInference(false);
+                } else if (strncmp(serialBuffer, "DUMP", 4) == 0) {
+                    // Triggered mode: run one inference AND dump spectrogram
+                    runInference(true);
                 } else if (strncmp(serialBuffer, "AUTO", 4) == 0) {
                     continuousMode = true;
                     Serial.println("Mode: CONTINUOUS");
@@ -343,6 +382,6 @@ void loop() {
 
     // Only run continuously if AUTO mode is enabled
     if (continuousMode) {
-        runInference();
+        runInference(false);
     }
 }

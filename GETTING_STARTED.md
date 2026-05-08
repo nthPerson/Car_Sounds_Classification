@@ -264,6 +264,16 @@ python src/playback_test.py --port /dev/ttyS3 --num-clips 208 --delay 3.0
 
 Use `--port COM3` on Windows. Place the Arduino near the speaker. Results are saved to `results/playback_test_results.json`.
 
+### 11e: Compare Python vs Arduino mel-spectrograms
+
+For slideshow / report figures, capture side-by-side spectrograms — librosa from the WAV file vs the spectrogram the Arduino actually computes on-device:
+
+```bash
+python src/compare_mel_spectrograms.py --port /dev/ttyS3
+```
+
+Press **SPACE** to capture each clip, **s** to skip, **q** to quit. For each clip the script saves `<clip>_python.png`, `<clip>_arduino.png`, and `<clip>_side_by_side.png` under `results/mel_comparison/`. Requires the latest `car_sound_classifier.ino` (which adds the `DUMP` serial command).
+
 ---
 
 ## Step 12: Review Comprehensive Evaluation (Phase 6)
@@ -334,4 +344,5 @@ All phases (0-7) are complete. The `docs/report/` directory contains the assembl
 | Export for Arduino | `python src/export_for_arduino.py --model m6 --tier 2 --method ptq` |
 | Validate features | `python src/validate_features.py` |
 | Run playback test | `python src/playback_test.py --port /dev/ttyS3` |
+| Compare mel spectrograms (Py vs Arduino) | `python src/compare_mel_spectrograms.py --port /dev/ttyS3` |
 | Review evaluation | `jupyter notebook notebooks/07_evaluation.ipynb` |

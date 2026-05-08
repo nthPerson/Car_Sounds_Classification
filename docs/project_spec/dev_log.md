@@ -4,6 +4,19 @@ This log tracks major progress, decisions, and results across the project. Add n
 
 ---
 
+## 2026-04-28 — Mel-spectrogram comparison tool (Python vs Arduino)
+
+**What was done:**
+- Added a `DUMP` serial command to `arduino/car_sound_classifier/car_sound_classifier.ino`. It runs the normal capture-classify cycle but also streams the raw 40×92 log-mel spectrogram (in dB, post `power_to_db(ref=np.max, top_db=80)`, before z-score normalization) over Serial as `MELDUMP_START|...` / `MELDUMP_END` framed CSV. The existing `READY` / `AUTO` / `STOP` commands are unchanged.
+- Added `src/compare_mel_spectrograms.py`. For each clip it plays the WAV through the speaker, reads the on-device spectrogram via the new `DUMP` command, computes the librosa-equivalent spectrogram from the original WAV, and saves three PNGs: `<clip>_python.png`, `<clip>_arduino.png`, `<clip>_side_by_side.png` (default output dir: `results/mel_comparison/`). UX mirrors `presentation_demo.py` — keyboard-driven (SPACE/s/q) with a live preview window. Reuses the helpers from `presentation_demo.py` for serial / playback so the two tools stay in sync.
+- Both spectrograms are plotted on a shared dB color scale (`vmin=-80, vmax=0`), so the side-by-side view shows the genuine acoustic differences caused by speaker / room / PDM-mic transduction.
+
+**Why:** Needed for slideshow figures comparing the "ideal" spectrogram (from the WAV file) against the spectrogram the Arduino actually computes from speaker-played audio captured on-device — directly visualizes the speaker-ablation story.
+
+**Status:** Tool ready to run. Re-flash the sketch to pick up the new `DUMP` command before using `compare_mel_spectrograms.py`.
+
+---
+
 ## 2026-03-26 — Phase 7: Final Report Assembly
 
 **What was done:**
